@@ -5,7 +5,7 @@ import { PRBTest } from "@prb/test/src/PRBTest.sol";
 import { console2 } from "forge-std/src/console2.sol";
 import { StdCheats } from "forge-std/src/StdCheats.sol";
 
-import { Foo } from "../src/Foo.sol";
+import { Foo } from "../src/contracts/Foundry/Foo.sol";
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
