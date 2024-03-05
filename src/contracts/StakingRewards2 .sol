@@ -111,7 +111,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
                 _balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add(
                     rewards[account]
                 ),
-                "_balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add(rewards[account])"
+                "_balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add"
+                "(rewards[account])"
             );
 
             return _balances[account].mul(constantRewardPerTokenStored).sub(userRewardPerTokenPaid[account]).add(
