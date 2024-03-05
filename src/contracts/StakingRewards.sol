@@ -7,14 +7,13 @@ pragma solidity ^0.7.6;
 // import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 // import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import "@openzeppelin/contracts@3.4.1/access/Ownable.sol";
-import "@openzeppelin/contracts@3.4.1/math/Math.sol";
-import "@openzeppelin/contracts@3.4.1/math/SafeMath.sol";
-import "@openzeppelin/contracts@3.4.1/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts@3.4.1/utils/ReentrancyGuard.sol";
+import { Ownable } from "@openzeppelin/contracts@3.4.1/access/Ownable.sol";
+import { Math } from "@openzeppelin/contracts@3.4.1/math/Math.sol";
+import { SafeMath } from "@openzeppelin/contracts@3.4.1/math/SafeMath.sol";
+import { IERC20, SafeERC20 } from "@openzeppelin/contracts@3.4.1/token/ERC20/SafeERC20.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts@3.4.1/utils/ReentrancyGuard.sol";
 
-
-import "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
+import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
 contract StakingRewards is ReentrancyGuard, Ownable {
@@ -72,7 +71,9 @@ contract StakingRewards is ReentrancyGuard, Ownable {
     }
 
     function earned(address account) public view returns (uint256) {
-        return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
+        return _balances[account]
+                    .mul(rewardPerToken().sub(userRewardPerTokenPaid[account]))
+                            .div(1e18).add(rewards[account]);
     }
 
     function getRewardForDuration() external view returns (uint256) {
