@@ -46,7 +46,7 @@
   tab_width = 4
   wrap_comments = true
   single_line_statement_blocks = "preserve"
-  ignore = ["src/contracts/Uniswap/*"]
+  ignore = [ "src/contracts/Uniswap/v2-core/interfaces/*.sol", "src/contracts/Uniswap/v2-core/libraries/*.sol", "src/contracts/Uniswap/v2-core/*.sol", "src/contracts/Uniswap/solidity-lib/libraries/*.sol", "src/contracts/Uniswap/v2-periphery/interfaces/*.sol", "src/contracts/Uniswap/v2-periphery/*.sol", "src/contracts/Uniswap/v2-periphery/libraries/*.sol" ]
 
 [rpc_endpoints]
   arbitrum = "https://arbitrum-mainnet.infura.io/v3/${API_KEY_INFURA}"
