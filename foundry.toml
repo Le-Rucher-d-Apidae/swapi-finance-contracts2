@@ -1,7 +1,9 @@
 # Full reference https://github.com/foundry-rs/foundry/tree/master/crates/config
 
 [profile.default]
-  auto_detect_solc = false
+  # Do not include the 'solc' variable when auto_detect_solc set to true
+  # forge will install version(s) required for compiling
+  auto_detect_solc = true
   block_timestamp = 1_680_220_800 # March 31, 2023 at 00:00 GMT
   bytecode_hash = "none"
   evm_version = "paris"           # See https://www.evmdiff.com/features?name=PUSH0&kind=opcode
@@ -11,7 +13,8 @@
   optimizer_runs = 10_000
   out = "out"
   script = "script"
-  solc = "0.8.23"
+  #multiple solc versions needed: do not set any specific version
+  #solc = "0.8.23"
   src = "src"
   test = "test"
 
