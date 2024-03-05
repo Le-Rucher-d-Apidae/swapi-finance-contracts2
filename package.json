@@ -31,7 +31,7 @@
   "scripts": {
     "cleanForge": "rm -rf cache out",
     "build": "forge build",
-    "lint": "bun run lint:sol && bun run prettier:check",
+    "lint": "pnpm run lint:sol && pnpm run prettier:check",
     "lint:sol": "forge fmt --check && bun solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check **/*.{json,md,yml} --ignore-path=.prettierignore",
     "prettier:write": "prettier --write **/*.{json,md,yml} --ignore-path=.prettierignore",
@@ -47,7 +47,7 @@
     "testHH": "npx hardhat test",
     "prepublishOnly": "npm test",
     "publishPublic": "npm publish --access public",
-    "PUBLISH": "npm run clean && npm run compile && yarn run publishPublic"
+    "PUBLISH": "pnpm run clean && pnpm run compile && yarn run publishPublic"
   },
   "dependencies": {
     "@openzeppelin/contracts-3.4.1": "npm:@openzeppelin/contracts@3.4.1",
