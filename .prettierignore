@@ -15,3 +15,16 @@ lcov.info
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+hardhat-artifacts
+hardhat-cache
+
+package.json
+README_PaulRBerg_foundry-template.md
+README.md
+src/contracts/Uniswap/**
+.vscode/**
+.github/**
+.gitpod.yml
+.mocharc.json
+.solhint.json
