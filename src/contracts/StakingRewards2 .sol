@@ -45,10 +45,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(
-        address _rewardsToken,
-        address _stakingToken
-    ) {
+    constructor(address _rewardsToken, address _stakingToken) {
         rewardsToken = IERC20(_rewardsToken);
         stakingToken = IERC20(_stakingToken);
     }
@@ -91,49 +88,46 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
             //      "lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate)");
             // Uint256ValueEvent(lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18),
             //      "lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18)");
-            return
-                // lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate)
-                constantRewardPerTokenStored;
+
+            // return lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate)
+            return constantRewardPerTokenStored;
         }
         if (_totalSupply == 0) {
             return rewardPerTokenStored;
         }
-        return
-            rewardPerTokenStored.add(
-                lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(_totalSupply)
-            );
+        return rewardPerTokenStored.add(
+            lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(_totalSupply)
+        );
     }
 
     // function earned(address account) public view returns (uint256) {
     function earned(address account) public /* view */ returns (uint256) {
         if (isVariableRewardRate) {
-
             Uint256ValueEvent(_balances[account], "_balances[account]");
             Uint256ValueEvent(constantRewardPerTokenStored, "constantRewardPerTokenStored");
             Uint256ValueEvent(userRewardPerTokenPaid[account], "userRewardPerTokenPaid[account]");
-
             Uint256ValueEvent(rewards[account], "rewards[account]");
-            Uint256ValueEvent(_balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account]))
-                .add(rewards[account]),
-    "_balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add(rewards[account])");
+            Uint256ValueEvent(
+                _balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add(
+                    rewards[account]
+                ),
+                "_balances[account].mul(constantRewardPerTokenStored.sub(userRewardPerTokenPaid[account])).add(rewards[account])"
+            );
 
-            return _balances[account]
-                .mul(constantRewardPerTokenStored)
-                    .sub(userRewardPerTokenPaid[account])
-                        .add(rewards[account]);
+            return _balances[account].mul(constantRewardPerTokenStored).sub(userRewardPerTokenPaid[account]).add(
+                rewards[account]
+            );
         }
-        return _balances[account]
-                    .mul(rewardPerToken()
-                        .sub(userRewardPerTokenPaid[account]))
-                            .div(1e18)
-                                .add(rewards[account]);
+        return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(
+            rewards[account]
+        );
     }
 
     function getRewardForDuration() external view returns (uint256) {
         //  if (isVariableRewardRate) {
         //     return variableRewardRate.mul(rewardsDuration);
         // }
-         if (isVariableRewardRate) {
+        if (isVariableRewardRate) {
             return variableRewardRate.mul(rewardsDuration);
         }
         return rewardRate.mul(rewardsDuration);
@@ -156,17 +150,26 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         }
 
         // if (isVariableRewardRate) {
-            // variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
-            // constantRewardPerTokenStored = constantRewardPerTokenStored.add(
-            //     lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
-            // );
+        //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
+        //  constantRewardPerTokenStored = constantRewardPerTokenStored.add(
+        //       lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
+        //   );
         // }
 
         emit Staked(msg.sender, amount);
     }
 
-    function stakeWithPermit(uint256 amount, uint deadline, uint8 v, bytes32 r, bytes32 s)
-    external nonReentrant updateReward(msg.sender) {
+    function stakeWithPermit(
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    )
+        external
+        nonReentrant
+        updateReward(msg.sender)
+    {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         if (isVariableRewardRate) {
@@ -180,17 +183,15 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
 
         // if (isVariableRewardRate) {
-            // variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
-            // constantRewardPerTokenStored = constantRewardPerTokenStored.add(
-            //     lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
-            // );
+        //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
+        //  constantRewardPerTokenStored = constantRewardPerTokenStored.add(
+        //         lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
+        //   );
         // }
         if (isVariableRewardRate) {
             // Update variable reward rate
             variableRewardRate = constantRewardPerTokenStored * _totalSupply;
         }
-
-
         emit Staked(msg.sender, amount);
     }
 
@@ -199,19 +200,16 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
         stakingToken.safeTransfer(msg.sender, amount);
-
         // if (isVariableRewardRate) {
-            // variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
-            // constantRewardPerTokenStored = constantRewardPerTokenStored.sub(
-            //     lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
-            // );
+        //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
+        //  constantRewardPerTokenStored = constantRewardPerTokenStored.sub(
+        //     lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
+        //   );
         // }
         if (isVariableRewardRate) {
             // Update variable reward rate
             variableRewardRate = constantRewardPerTokenStored * _totalSupply;
         }
-
-
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -240,7 +238,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
             // Update variable reward rate
             variableRewardRate = constantRewardPerTokenStored * _totalSupply;
         }
-
     }
 
     function exit() external {
@@ -253,7 +250,11 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
     // Always needs to update the balance of the contract when calling this method
     function notifyVariableRewardAmount(
         uint256 _constantRewardPerTokenStored,
-        uint256 _variableRewardMaxTotalSupply ) external onlyOwner {
+        uint256 _variableRewardMaxTotalSupply
+    )
+        external
+        onlyOwner
+    {
         isVariableRewardRate = true;
         constantRewardPerTokenStored = _constantRewardPerTokenStored;
         Uint256ValueEvent(constantRewardPerTokenStored, "constantRewardPerTokenStored");
@@ -267,14 +268,16 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         // This keeps the reward rate in the right range, preventing overflows due to
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
-        uint balance = rewardsToken.balanceOf(address(this));
+        uint256 balance = rewardsToken.balanceOf(address(this));
         Uint256ValueEvent(balance, "balance");
 
         // TODO: add and set a max cap when variable reward rate
         // require(variableRewardRate *  variableRewardMaxTotalSupply <= balance.div(rewardsDuration),
         //  "Provided reward too high");
-        Uint256ValueEvent(variableRewardMaxTotalSupply * constantRewardPerTokenStored,
-            "variableRewardMaxTotalSupply * constantRewardPerTokenStored");
+        Uint256ValueEvent(
+            variableRewardMaxTotalSupply * constantRewardPerTokenStored,
+            "variableRewardMaxTotalSupply * constantRewardPerTokenStored"
+        );
         Uint256ValueEvent(balance.div(rewardsDuration), "balance.div(rewardsDuration)");
         require(
             variableRewardMaxTotalSupply * _constantRewardPerTokenStored <= balance.div(rewardsDuration),
@@ -288,8 +291,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         emit RewardAddedPerTokenStored(_constantRewardPerTokenStored);
     }
 
-    function updateVariableRewardMaxTotalSupply(
-        uint256 _variableRewardMaxTotalSupply ) external onlyOwner {
+    function updateVariableRewardMaxTotalSupply(uint256 _variableRewardMaxTotalSupply) external onlyOwner {
         require(isVariableRewardRate, "Variable reward rate must be enabled");
         variableRewardMaxTotalSupply = _variableRewardMaxTotalSupply; // Set max LP cap ; if 0, no cap
 
@@ -297,7 +299,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         // This keeps the reward rate in the right range, preventing overflows due to
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
-        uint balance = rewardsToken.balanceOf(address(this));
+        uint256 balance = rewardsToken.balanceOf(address(this));
 
         // TODO: add and set a max cap when variable reward rate
         // require(variableRewardRate *  variableRewardMaxTotalSupply <= balance.div(rewardsDuration),
@@ -325,7 +327,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         // This keeps the reward rate in the right range, preventing overflows due to
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
-        uint balance = rewardsToken.balanceOf(address(this));
+        uint256 balance = rewardsToken.balanceOf(address(this));
         require(rewardRate <= balance.div(rewardsDuration), "Provided reward too high");
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp.add(rewardsDuration);
@@ -353,7 +355,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
     // reward rate at the time of activation is taken as reference
 
     // /**
-    //  * 
     //  * @param _variableRewardRate Enable/Disable variable reward rate
     //  * @dev If variable reward rate is enabled, variableRewardRate will be updated
     //  *      every time a user interacts with the contract
@@ -389,7 +390,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
         _;
     }
 
-
     /* ========== EVENTS ========== */
 
     event RewardAdded(uint256 reward);
@@ -405,7 +405,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
 
     /* ========== DEBUG ========== */
 
-
     /**
      * @dev Withdraw without caring about rewards. EMERGENCY ONLY.
      */
@@ -415,6 +414,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
     /**
      * @dev for testing only. remove after debugging
      */
+
     function emergencyWithdrawUnsafe() external {
         uint256 amount = _balances[msg.sender];
         require(amount > 0, "Cannot withdraw 0");
@@ -426,6 +426,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
     /**
      * @dev for testing only. remove after debugging
      */
+
     function emergencyWithdrawAllUnsafe() external onlyOwner {
         uint256 amount = _totalSupply;
         require(amount > 0, "Cannot withdraw 0");
@@ -439,4 +440,3 @@ contract StakingRewards2 is ReentrancyGuard, Ownable {
 
     //////////////////////////////////////////////////////////
 }
-
