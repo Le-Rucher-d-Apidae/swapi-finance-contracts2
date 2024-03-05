@@ -1,6 +1,8 @@
 # Full reference https://github.com/foundry-rs/foundry/tree/master/crates/config
 
 [profile.default]
+  # dirty workaround to disable solc downloads; use when all solc required versions are already available locally
+  # offline = true
   # Do not include the 'solc' variable when auto_detect_solc set to true
   # forge will install version(s) required for compiling
   auto_detect_solc = true
