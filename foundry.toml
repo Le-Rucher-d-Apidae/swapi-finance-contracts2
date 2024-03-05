@@ -45,6 +45,8 @@
   quote_style = "double"
   tab_width = 4
   wrap_comments = true
+  single_line_statement_blocks = "preserve"
+  ignore = ["src/contracts/Uniswap/*"]
 
 [rpc_endpoints]
   arbitrum = "https://arbitrum-mainnet.infura.io/v3/${API_KEY_INFURA}"
