@@ -44,13 +44,7 @@ module.exports = {
       },
       {
         version: '0.6.6',
-        settings: defaultCompilerSettings
-        // settings: {
-        //   optimizer: {
-        //     enabled: true,
-        //     runs: 1000
-        //   }
-        // }
+        settings: compilerSettingsOpt200
       },
       // {
       //   version: '0.7.0'
