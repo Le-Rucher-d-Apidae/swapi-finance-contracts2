@@ -17,7 +17,8 @@
   script = "script"
   #multiple solc versions needed: do not set any specific version
   #solc = "0.8.23"
-  src = "src"
+  #src = "src"
+  src = "src/contracts"
   test = "test"
 
 [profile.ci]

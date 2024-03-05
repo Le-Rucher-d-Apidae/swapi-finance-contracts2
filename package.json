@@ -1,14 +1,20 @@
 {
   "name": "@Le-Rucher-d-Apidae/swapi-finance-contracts2",
   "description": "temporary project for contracts for foundry testing",
-  "version": "1.0.0",
+  "version": "0.0.6",
   "author": {
-    "name": "Le-Rucher-d-Apidae",
+    "name": "Worker bee <dev@rucherapidae@gmail.com>",
     "url": "https://github.com/Le-Rucher-d-Apidae"
   },
+  "license": "MIT",
   "devDependencies": {
+    "@nomicfoundation/hardhat-foundry": "^1.1.1",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@prb/test": "^0.6.4",
     "forge-std": "github:foundry-rs/forge-std#v1.7.5",
+    "hardhat": "^2.21.0",
+    "hardhat-deploy": "^0.12.1",
     "prettier": "^3.0.0",
     "solhint": "^3.6.2"
   },
@@ -23,7 +29,7 @@
   ],
   "private": true,
   "scripts": {
-    "clean": "rm -rf cache out",
+    "cleanForge": "rm -rf cache out",
     "build": "forge build",
     "lint": "bun run lint:sol && bun run prettier:check",
     "lint:sol": "forge fmt --check && bun solhint {script,src,test}/**/*.sol",
@@ -31,7 +37,17 @@
     "prettier:write": "prettier --write **/*.{json,md,yml} --ignore-path=.prettierignore",
     "test": "forge test",
     "test:coverage": "forge coverage",
-    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage"
+    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
+    "clean": "rimraf ./build/ && rimraf ./artifacts/ && rimraf ./cache/",
+    "cleanAll": "pnpm run cleanForge",
+    "precompile": "rimraf ./build/",
+    "compile": "npx hardhat compile",
+    "COMPILE": "npx hardhat compile --force",
+    "pretest": "pnpm compile",
+    "testHH": "npx hardhat test",
+    "prepublishOnly": "npm test",
+    "publishPublic": "npm publish --access public",
+    "PUBLISH": "npm run clean && npm run compile && yarn run publishPublic"
   },
   "dependencies": {
     "@openzeppelin/contracts-3.4.1": "npm:@openzeppelin/contracts@3.4.1",
