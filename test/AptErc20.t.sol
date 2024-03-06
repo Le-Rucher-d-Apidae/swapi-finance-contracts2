@@ -1,14 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23 <0.9.0;
-
-// import { PRBTest } from "@prb/test/src/PRBTest.sol";
-
-// import { console2 } from "forge-std/src/console2.sol";
-// import { StdCheats } from "forge-std/src/StdCheats.sol";
+pragma solidity >=0.8.20 <0.9.0;
 
 import { console } from "forge-std/src/console.sol";
-// import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
-import { Test } from "forge-std/src/Test.sol";
+import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
 
 import { Utils } from "./utils/Utils.sol";
 
@@ -56,16 +50,14 @@ contract BaseSetup is Test {
     }
 }
 
-contract Mint is BaseSetup {
-    /* solhint-disable var-name-mixedcase */
+contract Setup is BaseSetup {
     AptErc20 internal Apt;
-    /* solhint-enable var-name-mixedcase */
 
     function setUp() public virtual override {
         BaseSetup.setUp();
         // Instantiate the contract-under-test.
         Apt = new AptErc20( admin, minter );
-        console.log("Mint");
+        console.log("Setup");
     }
 
     // function transferToken(address from, address to, uint256 transferAmount) public returns (bool) {
@@ -86,3 +78,72 @@ contract Mint is BaseSetup {
 //     }
 
 // }
+
+contract WhenTransferringTokens is Setup {
+    uint256 internal maxTransferAmount = 12e18;
+
+    function setUp() public virtual override {
+        BaseSetup.setUp();
+        console.log("When transferring tokens");
+    }
+
+    function transferToken(address from, address to, uint256 transferAmount) public returns (bool) {
+        vm.prank(from);
+        return Apt.transfer(to, transferAmount);
+    }
+}
+
+contract WhenAliceHasSufficientFunds is WhenTransferringTokens {
+    using stdStorage for StdStorage;
+
+    uint256 internal mintAmount = maxTransferAmount;
+
+    function setUp() public override {
+        WhenTransferringTokens.setUp();
+        console.log("When Alice has sufficient funds");
+        Apt.mint(alice, mintAmount);
+    }
+
+    function itTransfersAmountCorrectly(address from, address to, uint256 transferAmount) public {
+        uint256 fromBalanceBefore = Apt.balanceOf(from);
+        bool success = this.transferToken(from, to, transferAmount);
+
+        assertTrue(success);
+        assertEqDecimal(Apt.balanceOf(from), fromBalanceBefore - transferAmount, Apt.decimals());
+        assertEqDecimal(Apt.balanceOf(to), transferAmount, Apt.decimals());
+    }
+
+    function testTransferAllTokens() public {
+        itTransfersAmountCorrectly(alice, bob, maxTransferAmount);
+    }
+
+    function testTransferHalfTokens() public {
+        itTransfersAmountCorrectly(alice, bob, maxTransferAmount / 2);
+    }
+
+    function testTransferOneToken() public {
+        itTransfersAmountCorrectly(alice, bob, 1);
+    }
+
+    function testTransferWithFuzzing(uint64 transferAmount) public {
+        vm.assume(transferAmount != 0);
+        itTransfersAmountCorrectly(alice, bob, transferAmount % maxTransferAmount);
+    }
+
+    function testTransferWithMockedCall() public {
+        vm.prank(alice);
+        vm.mockCall(
+            address(this), abi.encodeWithSelector(Apt.transfer.selector, bob, maxTransferAmount), abi.encode(false)
+        );
+        bool success = Apt.transfer(bob, maxTransferAmount);
+        assertTrue(!success);
+        vm.clearMockedCalls();
+    }
+
+    // example how to use https://github.com/foundry-rs/forge-std stdStorage
+    function testFindMapping() public {
+        uint256 slot = stdstore.target(address(this)).sig(Apt.balanceOf.selector).with_key(alice).find();
+        bytes32 data = vm.load(address(this), bytes32(slot));
+        assertEqDecimal(uint256(data), mintAmount, Apt.decimals());
+    }
+}

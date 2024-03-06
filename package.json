@@ -38,6 +38,7 @@
     "test": "forge test",
     "forgeTestAll": "forge test -vv",
     "forgeTestMyERC20": "forge test -vvv --match-path test/MyERC20.t.sol",
+    "forgeTestAptErc20": "forge test -vvv --match-path test/AptErc20.t.sol",
     "test1": "forge test ",
     "test:coverage": "forge coverage",
     "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
