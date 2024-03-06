@@ -103,8 +103,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
         if (_totalSupply == 0) {
             return rewardPerTokenStored;
         }
-        return rewardPerTokenStored +
-            (( lastTimeRewardApplicable() - lastUpdateTime) * (rewardRate) * (1e18) / (_totalSupply));
+        return rewardPerTokenStored
+            + ((lastTimeRewardApplicable() - lastUpdateTime) * (rewardRate) * (1e18) / (_totalSupply));
     }
 
     // function earned(address account) public view returns (uint256) {
@@ -114,16 +114,16 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
             emit Uint256ValueEvent(constantRewardPerTokenStored, "constantRewardPerTokenStored");
             emit Uint256ValueEvent(userRewardPerTokenPaid[account], "userRewardPerTokenPaid[account]");
             emit Uint256ValueEvent(rewards[account], "rewards[account]");
+            // forgefmt: disable-next-line
             emit Uint256ValueEvent(
-                _balances[account] * (constantRewardPerTokenStored - userRewardPerTokenPaid[account]) +
-                    rewards[account]
-                ,
+                _balances[account] * (constantRewardPerTokenStored - userRewardPerTokenPaid[account])
+                    + rewards[account],
                 "_balances[account] * (constantRewardPerTokenStored-userRewardPerTokenPaid[account])+"
                 "rewards[account]"
             );
 
-            return _balances[account] * ((constantRewardPerTokenStored) - userRewardPerTokenPaid[account]) +
-                rewards[account];
+            return _balances[account] * ((constantRewardPerTokenStored) - userRewardPerTokenPaid[account])
+                + rewards[account];
         }
         return _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / 1e18 + rewards[account];
     }
@@ -283,7 +283,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
             variableRewardMaxTotalSupply * constantRewardPerTokenStored,
             "variableRewardMaxTotalSupply * constantRewardPerTokenStored"
         );
-        emit Uint256ValueEvent(balance / rewardsDuration , "balance / rewardsDuration");
+        emit Uint256ValueEvent(balance / rewardsDuration, "balance / rewardsDuration");
         require(
             variableRewardMaxTotalSupply * _constantRewardPerTokenStored <= balance / rewardsDuration,
             "Provided reward too high"
