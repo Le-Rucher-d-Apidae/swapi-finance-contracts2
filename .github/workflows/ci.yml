@@ -21,14 +21,22 @@ jobs:
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
 
-      - name: "Install Bun"
-        uses: "oven-sh/setup-bun@v1"
+        # - name: "Install Bun"
+        #   uses: "oven-sh/setup-bun@v1"
+      - name: "Install Pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
+      # - name: "Install the Node.js dependencies"
+      #   run: "bun install"
       - name: "Install the Node.js dependencies"
-        run: "bun install"
+        run: "pnpm install"
 
+      # - name: "Lint the code"
+      #   run: "bun run lint"
       - name: "Lint the code"
-        run: "bun run lint"
+        run: "pnpm run lint"
 
       - name: "Add lint summary"
         run: |
@@ -44,11 +52,17 @@ jobs:
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
 
-      - name: "Install Bun"
-        uses: "oven-sh/setup-bun@v1"
+      # - name: "Install Bun"
+      #   uses: "oven-sh/setup-bun@v1"
+      - name: "Install Pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
+      # - name: "Install the Node.js dependencies"
+      #   run: "bun install"
       - name: "Install the Node.js dependencies"
-        run: "bun install"
+        run: "pnpm install"
 
       - name: "Build the contracts and print their size"
         run: "forge build --sizes"
@@ -68,11 +82,17 @@ jobs:
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
 
-      - name: "Install Bun"
-        uses: "oven-sh/setup-bun@v1"
+      # - name: "Install Bun"
+      #   uses: "oven-sh/setup-bun@v1"
+      - name: "Install Pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
+      # - name: "Install the Node.js dependencies"
+      #   run: "bun install"
       - name: "Install the Node.js dependencies"
-        run: "bun install"
+        run: "pnpm install"
 
       - name: "Show the Foundry config"
         run: "forge config"
