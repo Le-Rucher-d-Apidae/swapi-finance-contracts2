@@ -132,13 +132,14 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
     //     });
     // }
 
-
     function testCannotTransferMoreThanAvailable() public {
         address from = alice;
         address to = bob;
         uint256 transferAmount = maxTransferAmount;
 
-        vm.expectRevert( abi.encodeWithSelector(ERC20InsufficientBalance.selector, from, balanceOf(from), transferAmount ) );
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC20InsufficientBalance.selector, from, balanceOf(from), transferAmount)
+        );
         transferToken(from, to, transferAmount);
     }
 
@@ -147,7 +148,7 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
         address to = address(0);
         uint256 transferAmount = mintAmount;
 
-        vm.expectRevert( abi.encodeWithSelector(ERC20InvalidReceiver.selector, to ) );
+        vm.expectRevert(abi.encodeWithSelector(ERC20InvalidReceiver.selector, to));
         transferToken(from, to, transferAmount);
     }
 }
