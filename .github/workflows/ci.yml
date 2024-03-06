@@ -3,6 +3,7 @@ name: "CI"
 env:
   API_KEY_ALCHEMY: ${{ secrets.API_KEY_ALCHEMY }}
   FOUNDRY_PROFILE: "ci"
+  PNPM_VERSION: "8.10.2"
 
 on:
   workflow_dispatch:
@@ -26,7 +27,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: 10
+          version: $PNPM_VERSION
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
@@ -57,7 +58,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: 10
+          version: $PNPM_VERSION
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
@@ -87,7 +88,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: 10
+          version: $PNPM_VERSION
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
