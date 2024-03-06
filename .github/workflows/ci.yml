@@ -27,7 +27,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: $PNPM_VERSION
+          version: "$PNPM_VERSION"
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
@@ -58,7 +58,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: $PNPM_VERSION
+          version: "$PNPM_VERSION"
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
@@ -88,7 +88,7 @@ jobs:
       - name: "Install Pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: $PNPM_VERSION
+          version: "$PNPM_VERSION"
 
       # - name: "Install the Node.js dependencies"
       #   run: "bun install"
