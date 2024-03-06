@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
-// pragma solidity 0.8.13;
 pragma solidity >=0.8.20 <0.9.0;
 
-// import {console} from "forge-std/console.sol";
-// import { console2 } from "forge-std/src/console2.sol";
 import { console } from "forge-std/src/console.sol";
 import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
 
@@ -106,33 +103,51 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
         _mint(alice, mintAmount);
     }
 
-    function itRevertsTransfer(
-        address from,
-        address to,
-        uint256 transferAmount,
-        string memory expectedRevertMessage
-    )
-        public
-    {
-        vm.expectRevert(abi.encodePacked(expectedRevertMessage));
+    // function itRevertsTransfer(
+    //     address from,
+    //     address to,
+    //     uint256 transferAmount,
+    //     string memory expectedRevertMessage
+    // )
+    //     public
+    // {
+    //     vm.expectRevert(abi.encodePacked(expectedRevertMessage));
+    //     transferToken(from, to, transferAmount);
+    // }
+    // function testCannotTransferMoreThanAvailable() public {
+    //     itRevertsTransfer({
+    //         from: alice,
+    //         to: bob,
+    //         transferAmount: maxTransferAmount,
+    //         expectedRevertMessage: "ERC20: transfer amount exceeds balance"
+    //     });
+    // }
+
+    // function testCannotTransferToZero() public {
+    //     itRevertsTransfer({
+    //         from: alice,
+    //         to: address(0),
+    //         transferAmount: mintAmount,
+    //         expectedRevertMessage: "ERC20: transfer to the zero address"
+    //     });
+    // }
+
+
+    function testCannotTransferMoreThanAvailable() public {
+        address from = alice;
+        address to = bob;
+        uint256 transferAmount = maxTransferAmount;
+
+        vm.expectRevert( abi.encodeWithSelector(ERC20InsufficientBalance.selector, from, balanceOf(from), transferAmount ) );
         transferToken(from, to, transferAmount);
     }
 
-    function testCannotTransferMoreThanAvailable() public {
-        itRevertsTransfer({
-            from: alice,
-            to: bob,
-            transferAmount: maxTransferAmount,
-            expectedRevertMessage: "ERC20: transfer amount exceeds balance"
-        });
-    }
-
     function testCannotTransferToZero() public {
-        itRevertsTransfer({
-            from: alice,
-            to: address(0),
-            transferAmount: mintAmount,
-            expectedRevertMessage: "ERC20: transfer to the zero address"
-        });
+        address from = alice;
+        address to = address(0);
+        uint256 transferAmount = mintAmount;
+
+        vm.expectRevert( abi.encodeWithSelector(ERC20InvalidReceiver.selector, to ) );
+        transferToken(from, to, transferAmount);
     }
 }
