@@ -4,27 +4,16 @@
 // pragma solidity ^0.8.23;
 pragma solidity >=0.8.20 < 0.9.0;
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/math/Math.sol";
-// import "@openzeppelin/contracts/math/SafeMath.sol";
-// import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-// import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
-// import { Ownable } from "@openzeppelin/contracts@3.4.1/access/Ownable.sol";
-// import { Math } from "@openzeppelin/contracts@3.4.1/math/Math.sol";
-// import { SafeMath } from "@openzeppelin/contracts@3.4.1/math/SafeMath.sol";
-// import { IERC20, SafeERC20 } from "@openzeppelin/contracts@3.4.1/token/ERC20/SafeERC20.sol";
-// import { ReentrancyGuard } from "@openzeppelin/contracts@3.4.1/utils/ReentrancyGuard.sol";
 import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
-// import { SafeMath } from "@openzeppelin/contracts@3.4.1/math/SafeMath.sol";
 import { IERC20, SafeERC20 } from "@openzeppelin/contracts@5.0.2/token/ERC20/utils/SafeERC20.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts@5.0.2/utils/ReentrancyGuard.sol";
+import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
-contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
+contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     // using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -140,7 +129,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function stake(uint256 amount) external nonReentrant updateReward(msg.sender) {
+    function stake(uint256 amount) external nonReentrant whenNotPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply + amount;
         if (isVariableRewardRate) {
@@ -173,6 +162,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender) {
     )
         external
         nonReentrant
+        whenNotPaused
         updateReward(msg.sender)
     {
         require(amount > 0, "Cannot stake 0");
