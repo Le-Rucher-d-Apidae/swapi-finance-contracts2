@@ -7,6 +7,9 @@ import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
 import { Utils } from "./utils/Utils.sol";
 
 import { AptErc20 } from "../src/contracts/AptErc20.sol";
+// import { ERC20InsufficientBalance, ERC20InvalidReceiver } from "@openzeppelin/contracts@5.0.2/interfaces/draft-IERC6093.sol";
+import { IERC20Errors } from "@openzeppelin/contracts@5.0.2/interfaces/draft-IERC6093.sol";
+
 
 interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -24,7 +27,8 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
-contract BaseSetup is Test {
+contract UsersSetup is Test {
+    bool verbose = true;
     Utils internal utils;
     address payable[] internal users;
 
@@ -35,6 +39,8 @@ contract BaseSetup is Test {
     address internal bob;
 
     function setUp() public virtual {
+        // console.log("UsersSetup setUp()");
+        verboseLog("UsersSetup setUp() start");
         utils = new Utils();
         users = utils.createUsers(4);
 
@@ -47,17 +53,24 @@ contract BaseSetup is Test {
         vm.label(alice, "Alice");
         bob = users[3];
         vm.label(bob, "Bob");
+        verboseLog("UsersSetup setUp() end");
+    }
+
+    function verboseLog(string memory _msg) public view {
+        if (verbose) console.log(_msg);
     }
 }
 
-contract Setup is BaseSetup {
+contract TokensSetup is UsersSetup {
     AptErc20 internal Apt;
 
     function setUp() public virtual override {
-        BaseSetup.setUp();
+        // console.log("TokensSetup setUp()");
+        verboseLog("TokensSetup setUp() start");
+        UsersSetup.setUp();
         // Instantiate the contract-under-test.
         Apt = new AptErc20( admin, minter );
-        console.log("Setup");
+        verboseLog("TokensSetup setUp() end");
     }
 
     // function transferToken(address from, address to, uint256 transferAmount) public returns (bool) {
@@ -79,12 +92,14 @@ contract Setup is BaseSetup {
 
 // }
 
-contract WhenTransferringTokens is Setup {
+contract WhenTransferringTokens is TokensSetup {
     uint256 internal maxTransferAmount = 12e18;
 
     function setUp() public virtual override {
-        BaseSetup.setUp();
+        verboseLog("WhenTransferringTokens setUp() start");
+        TokensSetup.setUp();
         console.log("When transferring tokens");
+        verboseLog("WhenTransferringTokens setUp() end");
     }
 
     function transferToken(address from, address to, uint256 transferAmount) public returns (bool) {
@@ -99,9 +114,13 @@ contract WhenAliceHasSufficientFunds is WhenTransferringTokens {
     uint256 internal mintAmount = maxTransferAmount;
 
     function setUp() public override {
+        verboseLog("WhenAliceHasSufficientFunds setUp() start");
         WhenTransferringTokens.setUp();
-        console.log("When Alice has sufficient funds");
+        verboseLog("WhenAliceHasSufficientFunds setUp() mint to Alice");
+        vm.prank(minter);
         Apt.mint(alice, mintAmount);
+        verboseLog("WhenAliceHasSufficientFunds setUp() end");
+        console.log("When Alice has sufficient funds");
     }
 
     function itTransfersAmountCorrectly(address from, address to, uint256 transferAmount) public {
@@ -133,7 +152,7 @@ contract WhenAliceHasSufficientFunds is WhenTransferringTokens {
     function testTransferWithMockedCall() public {
         vm.prank(alice);
         vm.mockCall(
-            address(this), abi.encodeWithSelector(Apt.transfer.selector, bob, maxTransferAmount), abi.encode(false)
+            address(Apt), abi.encodeWithSelector(Apt.transfer.selector, bob, maxTransferAmount), abi.encode(false)
         );
         bool success = Apt.transfer(bob, maxTransferAmount);
         assertTrue(!success);
@@ -142,8 +161,43 @@ contract WhenAliceHasSufficientFunds is WhenTransferringTokens {
 
     // example how to use https://github.com/foundry-rs/forge-std stdStorage
     function testFindMapping() public {
-        uint256 slot = stdstore.target(address(this)).sig(Apt.balanceOf.selector).with_key(alice).find();
-        bytes32 data = vm.load(address(this), bytes32(slot));
-        assertEqDecimal(uint256(data), mintAmount, Apt.decimals());
+        AptErc20 tokenToTest = Apt;
+        address tokenAddressToTest = address(tokenToTest);
+        uint256 slot = stdstore.target(address(tokenAddressToTest)).sig(Apt.balanceOf.selector).with_key(alice).find();
+        bytes32 data = vm.load(address(tokenAddressToTest), bytes32(slot));
+        assertEqDecimal(uint256(data), mintAmount, tokenToTest.decimals());
+    }
+}
+
+contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
+    uint256 internal mintAmount = maxTransferAmount - 1e18;
+
+    function setUp() public override {
+        verboseLog("WhenAliceHasInsufficientFunds setUp() start");
+        WhenTransferringTokens.setUp();
+        vm.prank(minter);
+        Apt.mint(alice, mintAmount);
+        console.log("When Alice has insufficient funds");
+        verboseLog("WhenAliceHasInsufficientFunds setUp() end");
+    }
+
+    function testCannotTransferMoreThanAvailable() public {
+        address from = alice;
+        address to = bob;
+        uint256 transferAmount = maxTransferAmount;
+
+        vm.expectRevert(
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, from, Apt.balanceOf(from), transferAmount)
+        );
+        transferToken(from, to, transferAmount);
+    }
+
+    function testCannotTransferToZero() public {
+        address from = alice;
+        address to = address(0);
+        uint256 transferAmount = mintAmount;
+
+        vm.expectRevert(abi.encodeWithSelector(IERC20Errors.ERC20InvalidReceiver.selector, to));
+        transferToken(from, to, transferAmount);
     }
 }
