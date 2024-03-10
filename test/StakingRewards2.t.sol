@@ -193,7 +193,7 @@ contract DepositSetup1 is StakingSetup1 {
         debugLog("DepositSetup1 setUp() end");
     }
 }
-
+/*
 contract AfterStaking1 is DepositSetup1 {
     uint256 immutable STAKING_END = STAKING_START_TIME + REWARD_DURATION;
 
@@ -268,9 +268,9 @@ contract AfterStaking1 is DepositSetup1 {
     }
 
 }
-
+*/
 // ----------------------------------------------------------------------------
-
+/*
 contract DuringStaking1_50 is DepositSetup1 {
 
     function setUp() public override {
@@ -351,7 +351,7 @@ contract DuringStaking1_50 is DepositSetup1 {
     }
 
 }
-
+*/
 // ----------------------------------------------------------------------------
 
 contract DuringStaking1 is DepositSetup1 {
@@ -388,15 +388,25 @@ contract DuringStaking1 is DepositSetup1 {
         checkBobStake();
     }
 
+    function getStakingTimeReached() internal view returns (uint256) {
+        uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION / (100/stakingPercentageDuration));
+        return stakingTimeReached;
+    }
+
     function gotoStakingPeriod() private {
         // verboseLog( "gotoStakingPeriod STAKING_START_TIME", STAKING_START_TIME );
         // verboseLog( "gotoStakingPeriod REWARD_DURATION", REWARD_DURATION );
         // verboseLog( "gotoStakingPeriod STAKING_START_TIME + REWARD_DURATION / 2", STAKING_START_TIME + REWARD_DURATION / 2 );
-        vm.warp( STAKING_START_TIME + REWARD_DURATION / (100/stakingPercentageDuration) );
+        // vm.warp( STAKING_START_TIME + REWARD_DURATION / (100/stakingPercentageDuration) );
+        vm.warp( getStakingTimeReached() );
+        
     }
 
     function checkStakingPeriod() public {
-        uint256 stakingTimeReached = STAKING_START_TIME + REWARD_DURATION / (100/stakingPercentageDuration);
+        // uint256 stakingTimeReached = STAKING_START_TIME + REWARD_DURATION / (100/stakingPercentageDuration);
+        // uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION / (100/stakingPercentageDuration));
+        // (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION / (100/stakingPercentageDuration));
+        uint256 stakingTimeReached = getStakingTimeReached();
         uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
         // verboseLog( "stakingTimeReached", stakingTimeReached );
         // verboseLog( "lastTimeReward", lastTimeReward );
@@ -445,6 +455,25 @@ contract DuringStaking1 is DepositSetup1 {
 
 // ----------------------------------------------------------------------------
 
-contract DuringStakingX is DuringStaking1(10) {
-
+contract DuringStaking1_0 is DuringStaking1(0) {
+}
+contract DuringStaking1_10 is DuringStaking1(10) {
+}
+contract DuringStaking1_20 is DuringStaking1(20) {
+}
+contract DuringStaking1_30 is DuringStaking1(30) {
+}
+contract DuringStaking1_40 is DuringStaking1(40) {
+}
+contract DuringStaking1_50 is DuringStaking1(50) {
+}
+contract DuringStaking1_60 is DuringStaking1(60) {
+}
+contract DuringStaking1_70 is DuringStaking1(70) {
+}
+contract DuringStaking1_80 is DuringStaking1(80) {
+}
+contract DuringStaking1_90 is DuringStaking1(90) {
+}
+contract DuringStaking1_100 is DuringStaking1(100) {
 }
