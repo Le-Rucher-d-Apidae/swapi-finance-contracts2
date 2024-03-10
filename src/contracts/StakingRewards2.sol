@@ -43,6 +43,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(address _rewardsToken, address _stakingToken) {
+        require(_rewardsToken != address(0),"Rewards can't be zero address");
+        require(_stakingToken != address(0),"Staking can't be zero address");
         rewardsToken = IERC20(_rewardsToken);
         stakingToken = IERC20(_stakingToken);
     }

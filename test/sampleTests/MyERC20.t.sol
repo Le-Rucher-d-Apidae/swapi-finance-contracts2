@@ -4,8 +4,8 @@ pragma solidity >=0.8.20 <0.9.0;
 import { console } from "forge-std/src/console.sol";
 import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
 
-import { Utils } from "./utils/Utils.sol";
-import { MyERC20 } from "../src/contracts/MyERC20.sol";
+import { Utils } from "../utils/Utils.sol";
+import { MyERC20 } from "../contracts/sampleContracts/MyERC20.sol";
 
 contract BaseSetup is MyERC20, Test {
     Utils internal utils;
