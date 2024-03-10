@@ -389,8 +389,10 @@ contract DuringStaking1 is DepositSetup1 {
     }
 
     function getStakingTimeReached() internal view returns (uint256) {
-        uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION / (100/stakingPercentageDuration));
-        return stakingTimeReached;
+        // uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION * stakingPercentageDuration / 100);
+        // return STAKING_START_TIME + stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100;
+        // return STAKING_START_TIME + REWARD_DURATION * stakingPercentageDuration / 100;
+        return STAKING_START_TIME + (stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100);
     }
 
     function gotoStakingPeriod() private {
@@ -434,10 +436,20 @@ contract DuringStaking1 is DepositSetup1 {
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached, uint256 _rewardDuration) public pure returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardDuration);
 
+        // verboseLog( "expectedStakingRewards _stakedAmount: ", _stakedAmount);
+        // verboseLog( "expectedStakingRewards _durationReached: ", _durationReached );
+        // verboseLog( "expectedStakingRewards _rewardDuration: ", _rewardDuration);
+        // verboseLog( "expectedStakingRewards rewardsDuration: ", rewardsDuration);
+        // verboseLog( "expectedStakingRewards REWARD_AMOUNT: ", REWARD_AMOUNT);
+        // verboseLog( "expectedStakingRewards TOTAL_STAKED_AMOUNT: ", TOTAL_STAKED_AMOUNT);
+        // verboseLog( "expectedStakingRewards rewardsDuration == _rewardDuration: ", (rewardsDuration == _rewardDuration ? 1 : 0) );
+        // verboseLog( "expectedStakingRewards REWARD_AMOUNT * _stakedAmount * rewardsDuration: ", REWARD_AMOUNT * _stakedAmount * rewardsDuration );
+        // verboseLog( "expectedStakingRewards REWARD_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT: ", REWARD_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT );
+
         // return REWARD_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT * rewardsDuration / _rewardDuration;
         return (rewardsDuration == _rewardDuration ?
             REWARD_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-            REWARD_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT * rewardsDuration / _rewardDuration
+            REWARD_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT
         );
     }
 
@@ -457,11 +469,14 @@ contract DuringStaking1 is DepositSetup1 {
 
 contract DuringStaking1_0 is DuringStaking1(0) {
 }
+
 contract DuringStaking1_10 is DuringStaking1(10) {
 }
 contract DuringStaking1_20 is DuringStaking1(20) {
 }
 contract DuringStaking1_30 is DuringStaking1(30) {
+}
+contract DuringStaking1_33 is DuringStaking1(33) {
 }
 contract DuringStaking1_40 is DuringStaking1(40) {
 }
@@ -469,11 +484,22 @@ contract DuringStaking1_50 is DuringStaking1(50) {
 }
 contract DuringStaking1_60 is DuringStaking1(60) {
 }
+contract DuringStaking1_66 is DuringStaking1(66) {
+}
 contract DuringStaking1_70 is DuringStaking1(70) {
 }
 contract DuringStaking1_80 is DuringStaking1(80) {
 }
 contract DuringStaking1_90 is DuringStaking1(90) {
 }
+contract DuringStaking1_99 is DuringStaking1(99) {
+}
 contract DuringStaking1_100 is DuringStaking1(100) {
+}
+
+contract DuringStaking1_110 is DuringStaking1(110) {
+}
+contract DuringStaking1_150 is DuringStaking1(150) {
+}
+contract DuringStaking1_220 is DuringStaking1(220) {
 }
