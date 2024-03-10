@@ -37,7 +37,7 @@
     "prettier:write": "prettier --write **/*.{json,md,yml} --ignore-path=.prettierignore",
     "test": "forge test",
     "forgeTestAll": "forge test -vv",
-    "forgeTestMyERC20": "forge test -vvv --match-path test/MyERC20.t.sol",
+    "forgeTestMyERC20": "forge test -vvv --match-path test/sampleTests/MyERC20.t.sol",
     "forgeTestAptErc20": "forge test -vvv --match-path test/AptErc20.t.sol",
     "forgeTestStakingRewards2": "forge test -vvv --match-path test/StakingRewards2.t.sol",
     "forgeTest": "forge test ",
