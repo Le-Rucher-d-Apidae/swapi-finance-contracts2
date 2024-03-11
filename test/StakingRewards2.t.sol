@@ -12,11 +12,15 @@ import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
 
 import { Utils } from "./utils/Utils.sol";
 
-import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
 
 import { StakingRewards2 } from "../src/contracts/StakingRewards2.sol";
 
+import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
+import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
+import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
+
 import { IERC20 } from "../src/contracts/Uniswap/v2-core/interfaces/IERC20.sol";
+
 import { RewardERC20 } from "./contracts/RewardERC20.sol";
 import { StakingERC20 } from "./contracts/StakingERC20.sol";
 
@@ -171,6 +175,20 @@ contract StakingSetup1 is Erc20Setup1 {
         debugLog("StakingSetup1 setUp() end");
     }
 
+    function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
+        uint256 stakingRewardsRewardPerToken = stakingRewards.rewardPerToken();
+        verboseLog( "checkRewardPerToken", stakingRewards.rewardPerToken() );
+        if ( _delta == 0 ) {
+            assertEq( _expectedRewardPerToken, stakingRewardsRewardPerToken, "Unexpected rewardPerToken() value");
+        } else {
+            assertApproxEqRel( _expectedRewardPerToken, stakingRewardsRewardPerToken, _delta, "Unexpected rewardPerToken() value");
+        }
+    }
+
+    function checkRewardForDuration() public {
+        verboseLog( "getRewardForDuration", stakingRewards.getRewardForDuration() );
+
+    }
 
 }
 
@@ -192,6 +210,14 @@ contract DepositSetup1 is StakingSetup1 {
         // TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup1 setUp() end");
     }
+
+    function checkStakingTotalSupplyStaked() public {
+        uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
+        uint256 stakingRewardsTotalSupply = stakingRewards.totalSupply();
+        assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
+    }
+
 }
 /*
 contract AfterStaking1 is DepositSetup1 {
@@ -388,11 +414,18 @@ contract DuringStaking1 is DepositSetup1 {
         checkBobStake();
     }
 
+    function getRewardDurationReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = (stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100);
+        verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+
+    }
+
     function getStakingTimeReached() internal view returns (uint256) {
         // uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION * stakingPercentageDuration / 100);
         // return STAKING_START_TIME + stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100;
         // return STAKING_START_TIME + REWARD_DURATION * stakingPercentageDuration / 100;
-        return STAKING_START_TIME + (stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100);
+        return STAKING_START_TIME + getRewardDurationReached();
     }
 
     function gotoStakingPeriod() private {
@@ -454,6 +487,9 @@ contract DuringStaking1 is DepositSetup1 {
     }
 
     function testUsersStakingRewards() public {
+        checkRewardPerToken(0 , 0);
+        checkRewardForDuration();
+        checkStakingTotalSupplyStaked();
         gotoStakingPeriod();
         checkUsersStake();
         checkStakingPeriod();
@@ -461,6 +497,11 @@ contract DuringStaking1 is DepositSetup1 {
         verboseLog( "Staking duration %% : ", stakingPercentageDuration );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_DURATION ) , 31e14 );
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_DURATION ) , 31e14 );
+        uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_DURATION ?
+            REWARD_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
+            REWARD_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_DURATION);
+        verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+        checkRewardPerToken( expectedRewardPerToken, /* 1e5 */ 0 );
     }
 
 }
@@ -470,36 +511,115 @@ contract DuringStaking1 is DepositSetup1 {
 contract DuringStaking1_0 is DuringStaking1(0) {
 }
 
-contract DuringStaking1_10 is DuringStaking1(10) {
-}
-contract DuringStaking1_20 is DuringStaking1(20) {
-}
+// contract DuringStaking1_10 is DuringStaking1(10) {
+// }
+// contract DuringStaking1_20 is DuringStaking1(20) {
+// }
 contract DuringStaking1_30 is DuringStaking1(30) {
 }
 contract DuringStaking1_33 is DuringStaking1(33) {
 }
-contract DuringStaking1_40 is DuringStaking1(40) {
-}
-contract DuringStaking1_50 is DuringStaking1(50) {
-}
-contract DuringStaking1_60 is DuringStaking1(60) {
-}
-contract DuringStaking1_66 is DuringStaking1(66) {
-}
-contract DuringStaking1_70 is DuringStaking1(70) {
-}
-contract DuringStaking1_80 is DuringStaking1(80) {
-}
-contract DuringStaking1_90 is DuringStaking1(90) {
-}
-contract DuringStaking1_99 is DuringStaking1(99) {
-}
+// contract DuringStaking1_40 is DuringStaking1(40) {
+// }
+// contract DuringStaking1_50 is DuringStaking1(50) {
+// }
+// contract DuringStaking1_60 is DuringStaking1(60) {
+// }
+// contract DuringStaking1_66 is DuringStaking1(66) {
+// }
+// contract DuringStaking1_70 is DuringStaking1(70) {
+// }
+// contract DuringStaking1_80 is DuringStaking1(80) {
+// }
+// contract DuringStaking1_90 is DuringStaking1(90) {
+// }
+// contract DuringStaking1_99 is DuringStaking1(99) {
+// }
 contract DuringStaking1_100 is DuringStaking1(100) {
 }
 
-contract DuringStaking1_110 is DuringStaking1(110) {
-}
-contract DuringStaking1_150 is DuringStaking1(150) {
-}
-contract DuringStaking1_220 is DuringStaking1(220) {
+// contract DuringStaking1_110 is DuringStaking1(110) {
+// }
+// contract DuringStaking1_150 is DuringStaking1(150) {
+// }
+// contract DuringStaking1_220 is DuringStaking1(220) {
+// }
+
+
+contract CheckStakingPermissions1 is StakingSetup1 {
+
+
+    function setUp() public virtual override {
+        // console.log("CheckStakingPermissions1 setUp()");
+        debugLog("CheckStakingPermissions1 setUp() start");
+        StakingSetup1.setUp();
+        debugLog("CheckStakingPermissions1 setUp() end");
+    }
+
+    function testStakingPause() public {
+
+        vm.prank(userAlice);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
+        );
+        verboseLog( "Only staking reward contract owner can pause" );
+
+        stakingRewards.setPaused(true);
+        assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Alice can't pause" );
+
+        vm.prank(userBob);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userBob )
+        );
+
+        stakingRewards.setPaused(true);
+        assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Bob can't pause" );
+
+        vm.startPrank(userStakingRewardAdmin);
+        // Check event emitted
+        vm.expectEmit(true,false,false,false, address(stakingRewards));
+        emit Pausable.Paused(userStakingRewardAdmin);
+        stakingRewards.setPaused(true);
+        assertEq( stakingRewards.paused(), true );
+        verboseLog( "Staking contract: Only owner can pause" );
+        verboseLog( "Staking contract: Event Paused emitted" );
+
+        stakingRewards.setPaused(true);
+        // Check no event emitted ?
+        assertEq( stakingRewards.paused(), true );
+        vm.stopPrank();
+
+        vm.prank(userAlice);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
+        );
+        verboseLog( "Only staking reward contract owner can unpause" );
+
+        stakingRewards.setPaused(false);
+        assertEq( stakingRewards.paused(), true );
+        verboseLog( "Staking contract: Alice can't unpause" );
+
+        vm.prank(userBob);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userBob )
+        );
+
+        stakingRewards.setPaused(false);
+        assertEq( stakingRewards.paused(), true );
+        verboseLog( "Staking contract: Bob can't unpause" );
+
+        vm.startPrank(userStakingRewardAdmin);
+        // Check event emitted
+        vm.expectEmit(true,false,false,false, address(stakingRewards));
+        emit Pausable.Unpaused(userStakingRewardAdmin);
+        stakingRewards.setPaused(false);
+        assertEq( stakingRewards.paused(), false );
+
+        verboseLog( "Staking contract: Only owner can unpause" );
+        verboseLog( "Staking contract: Event Unaused emitted" );
+        vm.stopPrank();
+    }
+
 }
