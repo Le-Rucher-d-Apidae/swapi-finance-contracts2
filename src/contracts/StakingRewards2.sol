@@ -10,10 +10,12 @@ import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts@5.0.2/utils/ReentrancyGuard.sol";
 
+import { IStakingRewards2Errors } from "./StakingRewards2Errors.sol";
+
 import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
-contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
+contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, IStakingRewards2Errors {
     // using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -47,8 +49,10 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(address _rewardsToken, address _stakingToken) {
-        require(_rewardsToken != address(0),"Rewards can't be zero address");
-        require(_stakingToken != address(0),"Staking can't be zero address");
+        // require(_rewardsToken != address(0),"Rewards can't be zero address");
+        if (_rewardsToken == address(0)) revert RewardTokenZeroAddress();
+        // require(_stakingToken != address(0),"Staking can't be zero address");
+        if (_stakingToken == address(0)) revert StakingTokenZeroAddress();
         rewardsToken = IERC20(_rewardsToken);
         stakingToken = IERC20(_stakingToken);
     }
@@ -136,10 +140,13 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function stake(uint256 amount) external nonReentrant whenNotPaused updateReward(msg.sender) {
-        require(amount > 0, "Cannot stake 0");
+        // require(amount > 0, "Cannot stake 0");
+        if (amount == 0) revert StakeZero();
         _totalSupply = _totalSupply + amount;
         if (isVariableRewardRate) {
-            require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds allowed max");
+            // require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds allowed max");
+            if (_totalSupply > variableRewardMaxTotalSupply)
+                revert StakeTotalSupplyExceedsAllowedMax(_totalSupply, variableRewardMaxTotalSupply);
         }
         _balances[msg.sender] = _balances[msg.sender] + amount;
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -171,10 +178,13 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
         whenNotPaused
         updateReward(msg.sender)
     {
-        require(amount > 0, "Cannot stake 0");
+        // require(amount > 0, "Cannot stake 0");
+        if (amount == 0) revert StakeZero();
         _totalSupply = _totalSupply + amount;
         if (isVariableRewardRate) {
-            require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds current allowed max");
+            // require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds current allowed max");
+            if (_totalSupply > variableRewardMaxTotalSupply)
+                revert StakeTotalSupplyExceedsAllowedMax(_totalSupply, variableRewardMaxTotalSupply);
         }
         _balances[msg.sender] = _balances[msg.sender] + amount;
 
@@ -197,7 +207,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
-        require(amount > 0, "Cannot withdraw 0");
+        // require(amount > 0, "Cannot withdraw 0");
+        if (amount == 0) revert WithdrawZero();
         _totalSupply = _totalSupply - amount;
         _balances[msg.sender] = _balances[msg.sender] - amount;
         stakingToken.safeTransfer(msg.sender, amount);
@@ -224,7 +235,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     }
 
     function compoundReward() public nonReentrant updateReward(msg.sender) {
-        require(stakingToken == rewardsToken, "Staking and rewards token must be the same");
+        // require(stakingToken == rewardsToken, "Staking and rewards token must be the same");
+        if (stakingToken != rewardsToken) revert CompoundDifferentTokens();
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             _totalSupply = _totalSupply + reward;
@@ -235,7 +247,9 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
         // total supply updated
         if (isVariableRewardRate) {
             // Prevents compounding if total supply exceeds max
-            require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds current allowed max");
+            // require(_totalSupply <= variableRewardMaxTotalSupply, "Total supply exceeds current allowed max");
+            if (_totalSupply > variableRewardMaxTotalSupply)
+                revert CompounedTotalSupplyExceedsAllowedMax(_totalSupply, variableRewardMaxTotalSupply);
             // Update variable reward rate
             variableRewardRate = constantRewardPerTokenStored * _totalSupply;
         }
@@ -280,10 +294,12 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
             "variableRewardMaxTotalSupply * constantRewardPerTokenStored"
         );
         emit Uint256ValueEvent(balance / rewardsDuration, "balance / rewardsDuration");
-        require(
-            variableRewardMaxTotalSupply * _constantRewardPerTokenStored <= balance / rewardsDuration,
-            "Provided reward too high"
-        );
+        // require(
+        //     variableRewardMaxTotalSupply * _constantRewardPerTokenStored <= balance / rewardsDuration,
+        //     "Provided reward too high"
+        // );
+        if (variableRewardMaxTotalSupply * _constantRewardPerTokenStored > balance / rewardsDuration)
+            revert ProvidedVariableRewardTooHigh(_constantRewardPerTokenStored, _variableRewardMaxTotalSupply, balance);
         emit MaxTotalSupply(variableRewardMaxTotalSupply);
 
         lastUpdateTime = block.timestamp;
@@ -293,7 +309,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     }
 
     function updateVariableRewardMaxTotalSupply(uint256 _variableRewardMaxTotalSupply) external onlyOwner {
-        require(isVariableRewardRate, "Variable reward rate must be enabled");
+        // require(isVariableRewardRate, "Variable reward rate must be enabled");
+        if (!isVariableRewardRate) revert NotVariableRewardRater();
         variableRewardMaxTotalSupply = _variableRewardMaxTotalSupply; // Set max LP cap ; if 0, no cap
 
         // Ensure the provided reward amount is not more than the balance in the contract.
@@ -305,10 +322,14 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
         // TODO: add and set a max cap when variable reward rate
         // require(variableRewardRate *  variableRewardMaxTotalSupply <= balance.div(rewardsDuration),
         //      "Provided reward too high for new max total supply");
-        require(
-            variableRewardMaxTotalSupply * constantRewardPerTokenStored <= balance / rewardsDuration,
-            "Provided reward too high"
-        );
+
+        // TODO : check already paid rewards
+        // require(
+        //     variableRewardMaxTotalSupply * constantRewardPerTokenStored <= balance / rewardsDuration,
+        //     "Provided reward too high"
+        // );
+        if (variableRewardMaxTotalSupply * constantRewardPerTokenStored > balance / rewardsDuration)
+            revert UpdateVariableRewardMaxTotalSupply(variableRewardMaxTotalSupply, balance);
         emit MaxTotalSupply(variableRewardMaxTotalSupply);
         lastUpdateTime = block.timestamp;
     }
@@ -328,7 +349,9 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
         uint256 balance = rewardsToken.balanceOf(address(this));
-        require(rewardRate <= balance / rewardsDuration, "Provided reward too high");
+        // ProvidedRewardTooHigh
+        // require(rewardRate <= balance / rewardsDuration, "Provided reward too high");
+        if (rewardRate > balance / rewardsDuration) revert ProvidedRewardTooHigh(reward);
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp + rewardsDuration;
         emit RewardAdded(reward);
@@ -336,16 +359,18 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
 
     // Added to support recovering LP Rewards from other systems such as BAL to be distributed to holders
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        // require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        if (tokenAddress == address(stakingToken)) revert CantWithdrawStakingToken();
         IERC20(tokenAddress).safeTransfer(owner(), tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
 
     function setRewardsDuration(uint256 _rewardsDuration) external onlyOwner {
-        require(
-            block.timestamp > periodFinish,
-            "Previous rewards period must be complete before changing the duration for the new period"
-        );
+        // require(
+        //     block.timestamp > periodFinish,
+        //     "Previous rewards period must be complete before changing the duration for the new period"
+        // );
+        if (block.timestamp <= periodFinish) revert RewardPeriodInProgress(block.timestamp, periodFinish);
         rewardsDuration = _rewardsDuration;
         emit RewardsDurationUpdated(rewardsDuration);
     }
@@ -435,7 +460,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     /**
      * @dev Withdraw without caring about rewards. EMERGENCY ONLY.
      */
-    function withdrawOnly() external {
+    function withdrawAllOnly() external {
         withdraw(_balances[msg.sender]);
     }
     /**
