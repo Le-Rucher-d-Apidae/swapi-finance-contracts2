@@ -10,7 +10,7 @@ import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts@5.0.2/utils/ReentrancyGuard.sol";
 
-import { IStakingRewards2Errors } from "./StakingRewards2Errors.sol";
+import { IStakingRewards2Errors } from "./IStakingRewards2Errors.sol";
 
 import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
