@@ -119,9 +119,9 @@ contract Erc20Setup1 is UsersSetup1 {
         // console.log("Erc20Setup1 setUp()");
         debugLog("Erc20Setup1 setUp() start");
         UsersSetup1.setUp();
-        rewardErc20 = new RewardERC20("TestReward", "TSTRWD");
-        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2", "UNI-V2");
         vm.startPrank(erc20Minter);
+        rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
+        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
         stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
         stakingERC20.mint(userBob, BOB_STAKINGERC20_MINTEDAMOUNT);
         vm.stopPrank();
@@ -164,6 +164,7 @@ contract StakingSetup1 is Erc20Setup1 {
         vm.prank( userStakingRewardAdmin );
         stakingRewards.setRewardsDuration(REWARD_DURATION);
 
+        vm.prank(erc20Minter);
         rewardErc20.mint( address(stakingRewards), REWARD_AMOUNT );
         // stakingStartTime = block.timestamp;
 
@@ -589,6 +590,7 @@ contract CheckStakingPermissions1 is StakingSetup1 {
         verboseLog( "Staking contract: Only owner can pause" );
         verboseLog( "Staking contract: Event Paused emitted" );
 
+        // Pausing again should not throw nor emit event and leave pause unchanged
         stakingRewards.setPaused(true);
         // Check no event emitted ?
         assertEq( stakingRewards.paused(), true );
@@ -622,7 +624,56 @@ contract CheckStakingPermissions1 is StakingSetup1 {
 
         verboseLog( "Staking contract: Only owner can unpause" );
         verboseLog( "Staking contract: Event Unaused emitted" );
+
+        // Unausing again should not throw nor emit event and leave pause unchanged
+        stakingRewards.setPaused(false);
+        // Check no event emitted ?
+        assertEq( stakingRewards.paused(), false );
+
         vm.stopPrank();
     }
 
+// setRewardsDuration
+
+    function testStakingNotifyRewardAmount() public {
+
+        vm.prank(erc20Minter);
+        rewardErc20.mint( address(stakingRewards), REWARD_AMOUNT );
+
+        vm.prank(userAlice);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
+        );
+        verboseLog( "Only staking reward contract owner can notifyRewardAmount" );
+
+        stakingRewards.notifyRewardAmount( 1 );
+        // assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Alice can't notifyRewardAmount" );
+
+        vm.prank(userBob);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userBob )
+        );
+
+        stakingRewards.notifyRewardAmount( 1 );
+        // assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Bob can't notifyRewardAmount" );
+
+        vm.startPrank(userStakingRewardAdmin);
+        // Check event emitted
+        vm.expectEmit(true,false,false,false, address(stakingRewards));
+        emit StakingRewards2.RewardAdded( 1 );
+        stakingRewards.notifyRewardAmount( 1 );
+        // assertEq( stakingRewards.paused(), true );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount" );
+        verboseLog( "Staking contract: Event Paused emitted" );
+
+        // stakingRewards.notifyRewardAmount(  );
+        // // Check no event emitted ?
+        // assertEq( stakingRewards.paused(), true );
+        vm.stopPrank();
+
+
+        // vm.stopPrank();
+    }
 }
