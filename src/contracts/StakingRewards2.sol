@@ -4,11 +4,11 @@
 // pragma solidity ^0.8.23;
 pragma solidity >=0.8.20 < 0.9.0;
 
-import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
-import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
 import { IERC20, SafeERC20 } from "@openzeppelin/contracts@5.0.2/token/ERC20/utils/SafeERC20.sol";
-import { ReentrancyGuard } from "@openzeppelin/contracts@5.0.2/utils/ReentrancyGuard.sol";
+import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
+import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts@5.0.2/utils/ReentrancyGuard.sol";
 
 import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
@@ -39,6 +39,10 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
     uint256 public constantRewardPerTokenStored;
     uint256 public variableRewardMaxTotalSupply;
     // uint256 public variableRewardRateInitialTotalSupply;
+
+    // Pausable
+    uint public lastPauseTime;
+    uint public lastUnpauseTime;
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -386,6 +390,33 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable {
         _;
     }
 
+    /* ========== PAUSABLE ========== */
+
+    function setPaused(bool _paused) external onlyOwner {
+        // Ensure we're actually changing the state before we do anything
+        if (_paused == paused()) {
+            return;
+        }
+
+        // Set our paused state.
+        // paused = _paused;
+        if (_paused) {
+            lastPauseTime = block.timestamp;
+            _pause();
+        } else {
+            lastUnpauseTime = block.timestamp;
+            _unpause();
+        }
+
+        // If applicable, set the last pause time.
+        // if (paused) {
+        //     lastPauseTime = now;
+        // }
+
+        // Let everyone know that our pause state has changed.
+        // Events Paused/Unpaused emmited by _pause()/_un_pause()
+        // emit PauseChanged(paused);
+    }
     /* ========== EVENTS ========== */
 
     event RewardAdded(uint256 reward);
