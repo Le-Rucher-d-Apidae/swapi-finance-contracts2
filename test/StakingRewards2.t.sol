@@ -73,6 +73,8 @@ contract TestLog is Test {
     }
 }
 
+// ----------------
+
 contract UsersSetup1 is TestLog {
     address payable[] internal users;
 
@@ -134,6 +136,46 @@ contract UsersSetup2 is TestLog {
     }
 }
 
+// ----------------
+
+contract UsersSetup3 is TestLog {
+    address payable[] internal users;
+
+    address internal erc20Admin;
+    address internal erc20Minter;
+    address internal userStakingRewardAdmin;
+
+    address internal userAlice;
+    address internal userBob;
+    address internal userCherry;
+
+    function setUp() public virtual {
+
+        // console.log("UsersSetup3 setUp()");
+        debugLog("UsersSetup3 setUp() start");
+        utils = new Utils();
+        users = utils.createUsers(6);
+
+        erc20Admin = users[0];
+        vm.label(erc20Admin, "ERC20Admin");
+        erc20Minter = users[1];
+        vm.label(erc20Minter, "ERC20Minter");
+        userStakingRewardAdmin = users[2];
+        vm.label(userStakingRewardAdmin, "StakingRewardAdmin");
+
+        userAlice = users[3];
+        vm.label(userAlice, "Alice");
+        userBob = users[4];
+        vm.label(userBob, "Bob");
+        userCherry = users[5];
+        vm.label(userCherry, "Cherry");
+
+        debugLog("UsersSetup3 setUp() end");
+    }
+}
+
+// ------------------------------------
+
 contract Erc20Setup1 is UsersSetup1 {
 
     RewardERC20 internal rewardErc20;
@@ -153,6 +195,7 @@ contract Erc20Setup1 is UsersSetup1 {
         debugLog("Erc20Setup1 setUp() end");
     }
 }
+
 contract Erc20Setup2 is UsersSetup2 {
 
     RewardERC20 internal rewardErc20;
@@ -174,6 +217,32 @@ contract Erc20Setup2 is UsersSetup2 {
         debugLog("Erc20Setup2 setUp() end");
     }
 }
+
+contract Erc20Setup3 is UsersSetup3 {
+
+    RewardERC20 internal rewardErc20;
+    StakingERC20 internal stakingERC20;
+    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 3e18;
+    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 2e18;
+    uint256 constant CHERRY_STAKINGERC20_MINTEDAMOUNT = 1e18;
+
+
+    function setUp() public virtual override {
+        // console.log("Erc20Setup3 setUp()");
+        debugLog("Erc20Setup3 setUp() start");
+        UsersSetup3.setUp();
+        vm.startPrank(erc20Minter);
+        rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
+        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
+        stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
+        stakingERC20.mint(userBob, BOB_STAKINGERC20_MINTEDAMOUNT);
+        stakingERC20.mint(userCherry, CHERRY_STAKINGERC20_MINTEDAMOUNT);
+        vm.stopPrank();
+        debugLog("Erc20Setup3 setUp() end");
+    }
+}
+
+// ----------------
 
 contract StakingSetup1 is Erc20Setup1 {
 
@@ -236,6 +305,8 @@ contract StakingSetup1 is Erc20Setup1 {
     }
 }
 
+// ----------------
+
 contract StakingSetup2 is Erc20Setup2 {
 
     StakingRewards2 internal stakingRewards;
@@ -262,7 +333,6 @@ contract StakingSetup2 is Erc20Setup2 {
 
         vm.prank(erc20Minter);
         rewardErc20.mint( address(stakingRewards), REWARD_INITIAL_AMOUNT );
-        // stakingStartTime = block.timestamp;
 
         vm.prank( userStakingRewardAdmin );
         stakingRewards.notifyRewardAmount(REWARD_INITIAL_AMOUNT);
@@ -302,6 +372,77 @@ contract StakingSetup2 is Erc20Setup2 {
     }
 }
 
+// ----------------
+
+contract StakingSetup3 is Erc20Setup3 {
+
+    StakingRewards2 internal stakingRewards;
+    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10 000 s.
+
+    uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
+    uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
+    uint256 constant CHERRY_STAKINGERC20_STAKEDAMOUNT = CHERRY_STAKINGERC20_MINTEDAMOUNT;
+
+    uint256 immutable STAKING_START_TIME = block.timestamp;
+
+    function setUp() public virtual override {
+        // console.log("StakingSetup3 setUp()");
+        debugLog("StakingSetup3 setUp() start");
+        Erc20Setup3.setUp();
+        vm.prank( userStakingRewardAdmin );
+        stakingRewards = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
+        assertEq( userStakingRewardAdmin, stakingRewards.owner(), "stakingRewards: Wrong owner" );
+
+        // checkOnlyAddressCanInvoke( userStakingRewardAdmin, address[](users), address(stakingRewards), bytes4(keccak256("setRewardsDuration")) );
+
+        vm.prank( userStakingRewardAdmin );
+        stakingRewards.setRewardsDuration(REWARD_INITIAL_DURATION);
+
+        vm.prank(erc20Minter);
+        rewardErc20.mint( address(stakingRewards), REWARD_INITIAL_AMOUNT );
+
+        vm.prank( userStakingRewardAdmin );
+        stakingRewards.notifyRewardAmount(REWARD_INITIAL_AMOUNT);
+
+        // debugLog("Staking start time", stakingStartTime);
+        debugLog("Staking start time", STAKING_START_TIME);
+        debugLog("StakingSetup3 setUp() end");
+    }
+
+    function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
+        uint256 stakingRewardsRewardPerToken = stakingRewards.rewardPerToken();
+        verboseLog( "checkRewardPerToken rewardPerToken = ", stakingRewards.rewardPerToken() );
+        if ( _delta == 0 ) {
+            assertEq( _expectedRewardPerToken, stakingRewardsRewardPerToken, "Unexpected rewardPerToken() value");
+
+        } else {
+            assertApproxEqRel( _expectedRewardPerToken, stakingRewardsRewardPerToken, _delta, "Unexpected rewardPerToken() value");
+        }
+    }
+
+    function checkRewardForDuration() public {
+        uint256 rewardForDuration;
+
+        rewardForDuration = stakingRewards.getRewardForDuration( );
+        verboseLog( "checkRewardForDuration: getRewardForDuration = ", stakingRewards.getRewardForDuration() );
+        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
+
+        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION ); // epoch last time reward
+        rewardForDuration = stakingRewards.getRewardForDuration( );
+        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
+
+        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION + 1 ); // epoch ended
+        rewardForDuration = stakingRewards.getRewardForDuration( );
+        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
+
+        verboseLog( "Staking contract: rewardsDuration ok" );
+    }
+}
+
+
+// ------------------------------------
+
 contract DepositSetup1 is StakingSetup1 {
 
     uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
@@ -321,12 +462,15 @@ contract DepositSetup1 is StakingSetup1 {
     }
 
     function checkStakingTotalSupplyStaked() public {
-        uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT;
+        // uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT;
         uint256 stakingRewardsTotalSupply = stakingRewards.totalSupply();
-        assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        // assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
         verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
     }
 }
+
+// ----------------
 
 contract DepositSetup2 is StakingSetup2 {
 
@@ -347,9 +491,43 @@ contract DepositSetup2 is StakingSetup2 {
     }
 
     function checkStakingTotalSupplyStaked() public {
-        uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
+        // uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
         uint256 stakingRewardsTotalSupply = stakingRewards.totalSupply();
-        assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        // assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
+        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
+    }
+}
+
+// ----------------
+
+contract DepositSetup3 is StakingSetup3 {
+
+    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
+        + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
+
+    function setUp() public virtual override {
+        // console.log("DepositSetup3 setUp()");
+        debugLog("DepositSetup3 setUp() start");
+        StakingSetup3.setUp();
+        vm.startPrank(userAlice);
+        stakingERC20.approve( address(stakingRewards), ALICE_STAKINGERC20_STAKEDAMOUNT );
+        stakingRewards.stake( ALICE_STAKINGERC20_STAKEDAMOUNT );
+        vm.startPrank(userBob);
+        stakingERC20.approve( address(stakingRewards), BOB_STAKINGERC20_STAKEDAMOUNT );
+        stakingRewards.stake( BOB_STAKINGERC20_STAKEDAMOUNT );
+        vm.startPrank(userCherry);
+        stakingERC20.approve( address(stakingRewards), CHERRY_STAKINGERC20_STAKEDAMOUNT );
+        stakingRewards.stake( CHERRY_STAKINGERC20_STAKEDAMOUNT );
+        vm.stopPrank();
+        debugLog("DepositSetup3 setUp() end");
+    }
+
+    function checkStakingTotalSupplyStaked() public {
+        // uint256 expectedTotalSupplyStaked = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
+        uint256 stakingRewardsTotalSupply = stakingRewards.totalSupply();
+        // assertEq( expectedTotalSupplyStaked, stakingRewardsTotalSupply );
+        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
         verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
     }
 }
@@ -571,8 +749,124 @@ contract DuringStaking2 is DepositSetup2 {
     }
 }
 
-// ----------------------------------------------------------------------------
+// ------------------------------------
 
+contract DuringStaking3 is DepositSetup3 {
+
+    uint256 immutable stakingPercentageDuration;
+
+    constructor (uint256 _stakingPercentageDuration) {
+        stakingPercentageDuration = _stakingPercentageDuration;
+    }
+
+    function setUp() public override {
+        debugLog("DuringStaking3 setUp() start");
+        DepositSetup3.setUp();
+        // console.log("DuringStaking3");
+        debugLog("DuringStaking3 setUp() end");
+    }
+
+    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
+        uint256 userStakedBalance = stakingRewards.balanceOf(address(_user));
+        verboseLog(_userName);
+        verboseLog(" staked balance: ", userStakedBalance);
+        assertEq( _stakeAmount, userStakedBalance );
+    }
+
+    function checkAliceStakes() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
+    function checkBobStake() public {
+        itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkCherryStake() public {
+        itStakesCorrectly(userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkUsersStake() public {
+        checkAliceStakes();
+        checkBobStake();
+        checkCherryStake();
+    }
+
+    function getRewardDurationReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = (stakingPercentageDuration >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * stakingPercentageDuration / 100);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+    function getStakingTimeReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = getRewardDurationReached();
+        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
+        return STAKING_START_TIME + rewardDurationReached;
+    }
+
+    function gotoStakingPeriod() private {
+        vm.warp( getStakingTimeReached() );
+    }
+
+    function checkStakingPeriod() public {
+        uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
+        // verboseLog( "stakingTimeReached", stakingTimeReached );
+        // verboseLog( "lastTimeReward", lastTimeReward );
+        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    }
+
+    function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
+
+        uint256 stakerRewards = stakingRewards.earned( _staker );
+        if (_delta == 0) {
+            assertEq( stakerRewards, _expectedRewardAmount );
+        } else {
+            assertApproxEqRel( stakerRewards, _expectedRewardAmount, _delta );
+        }
+        verboseLog( _stakerName );
+        verboseLog( " rewards: ",  stakerRewards);
+    }
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached, uint256 _rewardDuration) public pure returns (uint256 expectedRewardsAmount) {
+        uint256 rewardsDuration = Math.min(_durationReached, _rewardDuration);
+
+        // verboseLog( "expectedStakingRewards _stakedAmount: ", _stakedAmount);
+        // verboseLog( "expectedStakingRewards _durationReached: ", _durationReached );
+        // verboseLog( "expectedStakingRewards _rewardDuration: ", _rewardDuration);
+        // verboseLog( "expectedStakingRewards rewardsDuration: ", rewardsDuration);
+        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT: ", REWARD_INITIAL_AMOUNT);
+        // verboseLog( "expectedStakingRewards TOTAL_STAKED_AMOUNT: ", TOTAL_STAKED_AMOUNT);
+        // verboseLog( "expectedStakingRewards rewardsDuration == _rewardDuration: ", (rewardsDuration == _rewardDuration ? 1 : 0) );
+        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration: ", REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration );
+        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT: ", REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT );
+
+        // return REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT * rewardsDuration / _rewardDuration;
+        return (rewardsDuration == _rewardDuration ?
+            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardDuration / TOTAL_STAKED_AMOUNT
+        );
+    }
+
+    function testUsersStakingRewards() public {
+        checkRewardPerToken(0 , 0);
+        checkRewardForDuration();
+        checkStakingTotalSupplyStaked();
+        gotoStakingPeriod();
+        checkUsersStake();
+        checkStakingPeriod();
+        uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
+        verboseLog( "Staking duration %% : ", stakingPercentageDuration );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
+        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
+        checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
+        uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
+            REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
+        // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+        checkRewardPerToken( expectedRewardPerToken, /* 1e5 */ 0 );
+    }
+}
+
+// ----------------------------------------------------------------------------
+/*
 contract DuringStaking1_0 is DuringStaking1(0) {
 }
 contract DuringStaking1_10 is DuringStaking1(10) {
@@ -601,8 +895,8 @@ contract DuringStaking1_10 is DuringStaking1(10) {
 // }
 contract DuringStaking1_100 is DuringStaking1(100) {
 }
-// contract DuringStaking1_110 is DuringStaking1(110) {
-// }
+contract DuringStaking1_110 is DuringStaking1(110) {
+}
 // contract DuringStaking1_150 is DuringStaking1(150) {
 // }
 // contract DuringStaking1_220 is DuringStaking1(220) {
@@ -610,10 +904,10 @@ contract DuringStaking1_100 is DuringStaking1(100) {
 
 // ------------------------------------
 
-// contract DuringStaking2_0 is DuringStaking2(0) {
-// }
-// contract DuringStaking2_10 is DuringStaking2(10) {
-// }
+contract DuringStaking2_0 is DuringStaking2(0) {
+}
+contract DuringStaking2_10 is DuringStaking2(10) {
+}
 // contract DuringStaking2_20 is DuringStaking2(20) {
 // }
 // contract DuringStaking2_30 is DuringStaking2(30) {
@@ -636,15 +930,53 @@ contract DuringStaking1_100 is DuringStaking1(100) {
 // }
 // contract DuringStaking2_99 is DuringStaking2(99) {
 // }
-// contract DuringStaking2_100 is DuringStaking2(100) {
-// }
-// contract DuringStaking2_110 is DuringStaking2(110) {
-// }
+contract DuringStaking2_100 is DuringStaking2(100) {
+}
+contract DuringStaking2_110 is DuringStaking2(110) {
+}
 // contract DuringStaking2_150 is DuringStaking2(150) {
 // }
 // contract DuringStaking2_220 is DuringStaking2(220) {
 // }
+*/
+// ------------------------------------
 
+contract DuringStaking3_0 is DuringStaking3(0) {
+}
+contract DuringStaking3_10 is DuringStaking3(10) {
+}
+// contract DuringStaking3_20 is DuringStaking3(20) {
+// }
+// contract DuringStaking3_30 is DuringStaking3(30) {
+// }
+// contract DuringStaking3_33 is DuringStaking3(33) {
+// }
+// contract DuringStaking3_40 is DuringStaking3(40) {
+// }
+// contract DuringStaking3_50 is DuringStaking3(50) {
+// }
+// contract DuringStaking3_60 is DuringStaking3(60) {
+// }
+// contract DuringStaking3_66 is DuringStaking3(66) {
+// }
+// contract DuringStaking3_70 is DuringStaking3(70) {
+// }
+// contract DuringStaking3_80 is DuringStaking3(80) {
+// }
+// contract DuringStaking3_90 is DuringStaking3(90) {
+// }
+// contract DuringStaking3_99 is DuringStaking3(99) {
+// }
+contract DuringStaking3_100 is DuringStaking3(100) {
+}
+contract DuringStaking3_110 is DuringStaking3(110) {
+}
+// contract DuringStaking3_150 is DuringStaking3(150) {
+// }
+// contract DuringStaking3_220 is DuringStaking3(220) {
+// }
+
+// --------------------------------------------------------
 
 contract CheckStakingPermissions2 is StakingSetup2 {
 
@@ -813,5 +1145,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         verboseLog( "Staking contract: Owner can't setRewardsDuration before previous epoch end" );
         vm.stopPrank();
     }
-
 }
