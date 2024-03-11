@@ -177,9 +177,10 @@ contract StakingSetup1 is Erc20Setup1 {
 
     function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
         uint256 stakingRewardsRewardPerToken = stakingRewards.rewardPerToken();
-        verboseLog( "checkRewardPerToken", stakingRewards.rewardPerToken() );
+        verboseLog( "checkRewardPerToken rewardPerToken = ", stakingRewards.rewardPerToken() );
         if ( _delta == 0 ) {
             assertEq( _expectedRewardPerToken, stakingRewardsRewardPerToken, "Unexpected rewardPerToken() value");
+
         } else {
             assertApproxEqRel( _expectedRewardPerToken, stakingRewardsRewardPerToken, _delta, "Unexpected rewardPerToken() value");
         }
@@ -416,7 +417,7 @@ contract DuringStaking1 is DepositSetup1 {
 
     function getRewardDurationReached() internal view returns (uint256) {
         uint256 rewardDurationReached = (stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100);
-        verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
         return rewardDurationReached;
 
     }
@@ -425,7 +426,9 @@ contract DuringStaking1 is DepositSetup1 {
         // uint256 stakingTimeReached = STAKING_START_TIME + (stakingPercentageDuration == 0 ? 0 : REWARD_DURATION * stakingPercentageDuration / 100);
         // return STAKING_START_TIME + stakingPercentageDuration >= 100 ? REWARD_DURATION : REWARD_DURATION * stakingPercentageDuration / 100;
         // return STAKING_START_TIME + REWARD_DURATION * stakingPercentageDuration / 100;
-        return STAKING_START_TIME + getRewardDurationReached();
+        uint256 rewardDurationReached = getRewardDurationReached();
+        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
+        return STAKING_START_TIME + rewardDurationReached;
     }
 
     function gotoStakingPeriod() private {
@@ -500,7 +503,7 @@ contract DuringStaking1 is DepositSetup1 {
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_DURATION ?
             REWARD_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
             REWARD_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_DURATION);
-        verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+        // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
         checkRewardPerToken( expectedRewardPerToken, /* 1e5 */ 0 );
     }
 
