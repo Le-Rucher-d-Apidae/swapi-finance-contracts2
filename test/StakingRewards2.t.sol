@@ -29,7 +29,7 @@ import { StakingERC20 } from "./contracts/StakingERC20.sol";
 // import { MockERC20 } from "forge-std/src/mocks/MockERC20.sol";
 
 // TODO : move to utils
-contract MyTest is Test {
+contract TestLog is Test {
 
     bool debug = false;
     bool verbose = true;
@@ -76,7 +76,7 @@ contract MyTest is Test {
 
 }
 
-contract UsersSetup1 is MyTest {
+contract UsersSetup2 is TestLog {
     address payable[] internal users;
 
     address internal erc20Admin;
@@ -88,8 +88,8 @@ contract UsersSetup1 is MyTest {
 
     function setUp() public virtual {
 
-        // console.log("UsersSetup1 setUp()");
-        debugLog("UsersSetup1 setUp() start");
+        // console.log("UsersSetup2 setUp()");
+        debugLog("UsersSetup2 setUp() start");
         utils = new Utils();
         users = utils.createUsers(5);
 
@@ -104,12 +104,12 @@ contract UsersSetup1 is MyTest {
         vm.label(userAlice, "Alice");
         userBob = users[4];
         vm.label(userBob, "Bob");
-        debugLog("UsersSetup1 setUp() end");
+        debugLog("UsersSetup2 setUp() end");
     }
 
 }
 
-contract Erc20Setup1 is UsersSetup1 {
+contract Erc20Setup2 is UsersSetup2 {
 
     RewardERC20 internal rewardErc20;
     StakingERC20 internal stakingERC20;
@@ -118,21 +118,21 @@ contract Erc20Setup1 is UsersSetup1 {
 
 
     function setUp() public virtual override {
-        // console.log("Erc20Setup1 setUp()");
-        debugLog("Erc20Setup1 setUp() start");
-        UsersSetup1.setUp();
+        // console.log("Erc20Setup2 setUp()");
+        debugLog("Erc20Setup2 setUp() start");
+        UsersSetup2.setUp();
         vm.startPrank(erc20Minter);
         rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
         stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
         stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
         stakingERC20.mint(userBob, BOB_STAKINGERC20_MINTEDAMOUNT);
         vm.stopPrank();
-        debugLog("Erc20Setup1 setUp() end");
+        debugLog("Erc20Setup2 setUp() end");
     }
 
 }
 
-contract StakingSetup1 is Erc20Setup1 {
+contract StakingSetup2 is Erc20Setup2 {
 
     StakingRewards2 internal stakingRewards;
     uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
@@ -146,9 +146,9 @@ contract StakingSetup1 is Erc20Setup1 {
     uint256 immutable STAKING_START_TIME = block.timestamp;
 
     function setUp() public virtual override {
-        // console.log("StakingSetup1 setUp()");
-        debugLog("StakingSetup1 setUp() start");
-        Erc20Setup1.setUp();
+        // console.log("StakingSetup2 setUp()");
+        debugLog("StakingSetup2 setUp() start");
+        Erc20Setup2.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards.owner(), "stakingRewards: Wrong owner" );
@@ -175,7 +175,7 @@ contract StakingSetup1 is Erc20Setup1 {
 
         // debugLog("Staking start time", stakingStartTime);
         debugLog("Staking start time", STAKING_START_TIME);
-        debugLog("StakingSetup1 setUp() end");
+        debugLog("StakingSetup2 setUp() end");
     }
 
     function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
@@ -227,14 +227,14 @@ contract StakingSetup1 is Erc20Setup1 {
 
 }
 
-contract DepositSetup1 is StakingSetup1 {
+contract DepositSetup2 is StakingSetup2 {
 
     uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
 
     function setUp() public virtual override {
-        // console.log("DepositSetup1 setUp()");
-        debugLog("DepositSetup1 setUp() start");
-        StakingSetup1.setUp();
+        // console.log("DepositSetup2 setUp()");
+        debugLog("DepositSetup2 setUp() start");
+        StakingSetup2.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards), ALICE_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards.stake( ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -243,7 +243,7 @@ contract DepositSetup1 is StakingSetup1 {
         stakingRewards.stake( BOB_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
         // TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
-        debugLog("DepositSetup1 setUp() end");
+        debugLog("DepositSetup2 setUp() end");
     }
 
     function checkStakingTotalSupplyStaked() public {
@@ -255,14 +255,14 @@ contract DepositSetup1 is StakingSetup1 {
 
 }
 /*
-contract AfterStaking1 is DepositSetup1 {
+contract AfterStaking2 is DepositSetup2 {
     uint256 immutable STAKING_END = STAKING_START_TIME + REWARD_INITIAL_DURATION;
 
     function setUp() public override {
-        debugLog("AfterStaking1 setUp() start");
-        DepositSetup1.setUp();
-        // console.log("AfterStaking1");
-        debugLog("AfterStaking1 setUp() end");
+        debugLog("AfterStaking2 setUp() start");
+        DepositSetup2.setUp();
+        // console.log("AfterStaking2");
+        debugLog("AfterStaking2 setUp() end");
     }
 
     function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
@@ -332,13 +332,13 @@ contract AfterStaking1 is DepositSetup1 {
 */
 // ----------------------------------------------------------------------------
 /*
-contract DuringStaking1_50 is DepositSetup1 {
+contract DuringStaking2_50 is DepositSetup2 {
 
     function setUp() public override {
-        debugLog("DuringStaking1_50 setUp() start");
-        DepositSetup1.setUp();
-        // console.log("DuringStaking1_50");
-        debugLog("DuringStaking1_50 setUp() end");
+        debugLog("DuringStaking2_50 setUp() start");
+        DepositSetup2.setUp();
+        // console.log("DuringStaking2_50");
+        debugLog("DuringStaking2_50 setUp() end");
     }
 
     function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
@@ -415,7 +415,7 @@ contract DuringStaking1_50 is DepositSetup1 {
 */
 // ----------------------------------------------------------------------------
 
-contract DuringStaking1 is DepositSetup1 {
+contract DuringStaking2 is DepositSetup2 {
 
     // uint256 constant stakingPercentageDuration = 10;
     uint256 immutable stakingPercentageDuration;
@@ -425,10 +425,10 @@ contract DuringStaking1 is DepositSetup1 {
     }
 
     function setUp() public override {
-        debugLog("DuringStaking1 setUp() start");
-        DepositSetup1.setUp();
-        // console.log("DuringStaking1");
-        debugLog("DuringStaking1 setUp() end");
+        debugLog("DuringStaking2 setUp() start");
+        DepositSetup2.setUp();
+        // console.log("DuringStaking2");
+        debugLog("DuringStaking2 setUp() end");
     }
 
     function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
@@ -545,51 +545,51 @@ contract DuringStaking1 is DepositSetup1 {
 
 // ----------------------------------------------------------------------------
 
-contract DuringStaking1_0 is DuringStaking1(0) {
+contract DuringStaking2_0 is DuringStaking2(0) {
 }
 
-// contract DuringStaking1_10 is DuringStaking1(10) {
+// contract DuringStaking2_10 is DuringStaking2(10) {
 // }
-// contract DuringStaking1_20 is DuringStaking1(20) {
+// contract DuringStaking2_20 is DuringStaking2(20) {
 // }
-contract DuringStaking1_30 is DuringStaking1(30) {
+contract DuringStaking2_30 is DuringStaking2(30) {
 }
-contract DuringStaking1_33 is DuringStaking1(33) {
+contract DuringStaking2_33 is DuringStaking2(33) {
 }
-// contract DuringStaking1_40 is DuringStaking1(40) {
+// contract DuringStaking2_40 is DuringStaking2(40) {
 // }
-// contract DuringStaking1_50 is DuringStaking1(50) {
+// contract DuringStaking2_50 is DuringStaking2(50) {
 // }
-// contract DuringStaking1_60 is DuringStaking1(60) {
+// contract DuringStaking2_60 is DuringStaking2(60) {
 // }
-// contract DuringStaking1_66 is DuringStaking1(66) {
+// contract DuringStaking2_66 is DuringStaking2(66) {
 // }
-// contract DuringStaking1_70 is DuringStaking1(70) {
+// contract DuringStaking2_70 is DuringStaking2(70) {
 // }
-// contract DuringStaking1_80 is DuringStaking1(80) {
+// contract DuringStaking2_80 is DuringStaking2(80) {
 // }
-// contract DuringStaking1_90 is DuringStaking1(90) {
+// contract DuringStaking2_90 is DuringStaking2(90) {
 // }
-// contract DuringStaking1_99 is DuringStaking1(99) {
+// contract DuringStaking2_99 is DuringStaking2(99) {
 // }
-contract DuringStaking1_100 is DuringStaking1(100) {
+contract DuringStaking2_100 is DuringStaking2(100) {
 }
 
-// contract DuringStaking1_110 is DuringStaking1(110) {
+// contract DuringStaking2_110 is DuringStaking2(110) {
 // }
-// contract DuringStaking1_150 is DuringStaking1(150) {
+// contract DuringStaking2_150 is DuringStaking2(150) {
 // }
-// contract DuringStaking1_220 is DuringStaking1(220) {
+// contract DuringStaking2_220 is DuringStaking2(220) {
 // }
 
 
-contract CheckStakingPermissions1 is StakingSetup1 {
+contract CheckStakingPermissions1 is StakingSetup2 {
 
 
     function setUp() public virtual override {
         // console.log("CheckStakingPermissions1 setUp()");
         debugLog("CheckStakingPermissions1 setUp() start");
-        StakingSetup1.setUp();
+        StakingSetup2.setUp();
         debugLog("CheckStakingPermissions1 setUp() end");
     }
 
