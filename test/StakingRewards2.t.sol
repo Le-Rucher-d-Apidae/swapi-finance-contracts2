@@ -623,7 +623,7 @@ contract CheckStakingPermissions1 is StakingSetup1 {
         assertEq( stakingRewards.paused(), false );
 
         verboseLog( "Staking contract: Only owner can unpause" );
-        verboseLog( "Staking contract: Event Unaused emitted" );
+        verboseLog( "Staking contract: Event Unpaused emitted" );
 
         // Unausing again should not throw nor emit event and leave pause unchanged
         stakingRewards.setPaused(false);
@@ -666,14 +666,60 @@ contract CheckStakingPermissions1 is StakingSetup1 {
         stakingRewards.notifyRewardAmount( 1 );
         // assertEq( stakingRewards.paused(), true );
         verboseLog( "Staking contract: Only owner can notifyRewardAmount" );
-        verboseLog( "Staking contract: Event Paused emitted" );
+        verboseLog( "Staking contract: Event RewardAdded emitted" );
 
-        // stakingRewards.notifyRewardAmount(  );
-        // // Check no event emitted ?
-        // assertEq( stakingRewards.paused(), true );
         vm.stopPrank();
-
-
-        // vm.stopPrank();
     }
+
+    function testStakingSetRewardsDuration() public {
+
+        // Previous reward epoch must have ended before setting a new duration
+        vm.warp( STAKING_START_TIME + REWARD_DURATION + 1 );
+
+        vm.prank(userAlice);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
+        );
+        verboseLog( "Only staking reward contract owner can notifyRewardAmount" );
+
+        stakingRewards.setRewardsDuration( 1 );
+        // assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Alice can't setRewardsDuration" );
+
+        vm.prank(userBob);
+        vm.expectRevert(
+            abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userBob )
+        );
+
+        stakingRewards.setRewardsDuration( 1 );
+        // assertEq( stakingRewards.paused(), false );
+        verboseLog( "Staking contract: Bob can't setRewardsDuration" );
+
+        vm.prank(userStakingRewardAdmin);
+        // Check event emitted
+        vm.expectEmit(true,false,false,false, address(stakingRewards));
+        emit StakingRewards2.RewardsDurationUpdated( 1 );
+        stakingRewards.setRewardsDuration( 1 );
+        verboseLog( "Staking contract: Only owner can setRewardsDuration" );
+        verboseLog( "Staking contract: Event RewardsDurationUpdated emitted" );
+
+    }
+
+    function testStakingSetRewardsDurationBeforeEpochEnd() public {
+
+        // Previous reward epoch must have ended before setting a new duration
+        // vm.warp( STAKING_START_TIME + REWARD_DURATION + 1 );
+
+        vm.prank(userStakingRewardAdmin);
+        vm.expectRevert();
+        // vm.expectRevert(
+        //     abi.encodeWithSelector(
+        //         StakingRewards2.RewardPeriodInProgress., block.timestamp, STAKING_START_TIME + REWARD_DURATION )
+        // );
+        // abi.encodeWithSignature("RewardPeriodInProgress(uint256,uint256)")
+        stakingRewards.setRewardsDuration( 1 );
+        verboseLog( "Staking contract: Owner can't setRewardsDuration before previous epoch end" );
+
+    }
+
 }
