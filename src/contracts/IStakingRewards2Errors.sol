@@ -53,6 +53,15 @@ interface IStakingRewards2Errors {
     error CompoundDifferentTokens();
 
 
+    /**
+     * @dev Withdraw : Cannot withdraw more than deposited
+     */
+    error NotEnoughToWithdraw(uint256 amountToWithdraw, uint256 currentBalance);
+    /**
+     * @dev Nothing deposited: Cannot withdraw. = NotEnoughToWithdraw ( , 0 )
+     */
+    error NothingToWithdraw();
+
     /* variable reward rate */
 
     /**

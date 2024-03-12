@@ -14,6 +14,9 @@ import { IStakingRewards2Errors } from "./IStakingRewards2Errors.sol";
 
 import { IUniswapV2ERC20 } from "./Uniswap/v2-core/interfaces/IUniswapV2ERC20.sol";
 
+// DEBUG
+import { console } from "forge-std/src/console.sol";
+
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
 contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, IStakingRewards2Errors {
     // using SafeMath for uint256;
@@ -207,11 +210,20 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
+        console.log( "withdraw: amount = ", amount );
         // require(amount > 0, "Cannot withdraw 0");
         if (amount == 0) revert WithdrawZero();
+        if (_balances[msg.sender] == 0) revert NothingToWithdraw();
+        if (amount > _balances[msg.sender]) revert NotEnoughToWithdraw(amount, _balances[msg.sender]);
+
+        console.log( "withdraw: after 0 amount check" );
         _totalSupply = _totalSupply - amount;
+        console.log( "withdraw: _totalSupply = ", _totalSupply );
+        console.log( "withdraw: current _balances[msg.sender] = ", _balances[msg.sender] );
         _balances[msg.sender] = _balances[msg.sender] - amount;
+        console.log( "withdraw: new _balances[msg.sender] = ", _balances[msg.sender] );
         stakingToken.safeTransfer(msg.sender, amount);
+        console.log( "withdraw: after safeTransfer" );
         // if (isVariableRewardRate) {
         //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
         //  constantRewardPerTokenStored = constantRewardPerTokenStored.sub(
@@ -219,8 +231,10 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         //   );
         // }
         if (isVariableRewardRate) {
+            console.log( "withdraw: ISVARIABLEREWARDRATE" );
             // Update variable reward rate
             variableRewardRate = constantRewardPerTokenStored * _totalSupply;
+            console.log( "withdraw: variableRewardRate = ", variableRewardRate );
         }
         emit Withdrawn(msg.sender, amount);
     }
@@ -402,15 +416,20 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     /* ========== MODIFIERS ========== */
 
     modifier updateReward(address account) {
-        emit AddressEvent(account, "updateReward");
+        console.log( "updateReward: account = ", account );
+        // emit AddressEvent(account, "updateReward");
         rewardPerTokenStored = rewardPerToken();
+        console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
         lastUpdateTime = lastTimeRewardApplicable();
-        emit Uint256ValueEvent(rewardPerTokenStored, "rewardPerTokenStored");
+        console.log( "updateReward: lastUpdateTime = ", lastUpdateTime );
+        // emit Uint256ValueEvent(rewardPerTokenStored, "rewardPerTokenStored");
         if (account != address(0)) {
+            console.log( "updateReward: earned(account) = ", earned(account) );
             rewards[account] = earned(account);
-            emit Uint256ValueEvent(rewards[account], "rewards[account]");
+            // emit Uint256ValueEvent(rewards[account], "rewards[account]");
             userRewardPerTokenPaid[account] = rewardPerTokenStored;
-            emit Uint256ValueEvent(userRewardPerTokenPaid[account], "userRewardPerTokenPaid[account]");
+            console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
+            // emit Uint256ValueEvent(userRewardPerTokenPaid[account], "userRewardPerTokenPaid[account]");
         }
         _;
     }
