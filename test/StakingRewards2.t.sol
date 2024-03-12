@@ -1184,7 +1184,7 @@ contract DuringStaking1_WithoutWithdral_110_ is DuringStaking1_WithoutWithdral_(
 // }
 
 // --------------------------------------------------------
-/*
+
 contract CheckStakingPermissions2 is StakingSetup2 {
 
     function setUp() public virtual override {
@@ -1352,4 +1352,3 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.stopPrank();
     }
 }
-*/
