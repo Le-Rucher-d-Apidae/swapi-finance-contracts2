@@ -591,15 +591,24 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
     //     vm.warp( getStakingTimeReached() );
     // }
 
-    function checkStakingPeriod() public {
-        uint256 stakingTimeReached = getStakingTimeReached();
+    // function checkStakingPeriod() public {
+    //     uint256 stakingTimeReached = getStakingTimeReached();
+    //     uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
+    //     // verboseLog( "stakingTimeReached", stakingTimeReached );
+    //     // verboseLog( "lastTimeReward", lastTimeReward );
+    //     assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+    //     assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    // }
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
         uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
         // verboseLog( "stakingTimeReached", stakingTimeReached );
         // verboseLog( "lastTimeReward", lastTimeReward );
         assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
         assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
-
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
 
         uint256 stakerRewards = stakingRewards.earned( _staker );
@@ -639,7 +648,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         // gotoStakingPeriod();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         checkUsersStake();
-        checkStakingPeriod();
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 0 );
@@ -714,8 +723,18 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
     //     vm.warp( getStakingTimeReached() );
     // }
 
-    function checkStakingPeriod() public {
-        uint256 stakingTimeReached = getStakingTimeReached();
+    // function checkStakingPeriod() public {
+    //     uint256 stakingTimeReached = getStakingTimeReached();
+    //     uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
+    //     // verboseLog( "stakingTimeReached", stakingTimeReached );
+    //     // verboseLog( "lastTimeReward", lastTimeReward );
+    //     assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+    //     assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    // }
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
         uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
         // verboseLog( "stakingTimeReached", stakingTimeReached );
         // verboseLog( "lastTimeReward", lastTimeReward );
@@ -762,7 +781,7 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         // gotoStakingPeriod();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         checkUsersStake();
-        checkStakingPeriod();
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
@@ -842,15 +861,24 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     //     vm.warp( getStakingTimeReached() );
     // }
 
-    function checkStakingPeriod() public {
-        uint256 stakingTimeReached = getStakingTimeReached();
+    // function checkStakingPeriod() public {
+    //     uint256 stakingTimeReached = getStakingTimeReached();
+    //     uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
+    //     // verboseLog( "stakingTimeReached", stakingTimeReached );
+    //     // verboseLog( "lastTimeReward", lastTimeReward );
+    //     assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+    //     assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    // }
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
         uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
         // verboseLog( "stakingTimeReached", stakingTimeReached );
         // verboseLog( "lastTimeReward", lastTimeReward );
         assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
         assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
-
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
 
         uint256 stakerRewards = stakingRewards.earned( _staker );
@@ -890,7 +918,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         // gotoStakingPeriod();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         checkUsersStake();
-        checkStakingPeriod();
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
@@ -913,7 +941,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 // TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
 
 // contract DuringStaking1_WithWithdral is DepositSetup1 {
-contract DuringStaking1_WithoutWithdral_ is DepositSetup1 {
+contract DuringStaking1_WithWithdral is DepositSetup1 {
 
     uint256 immutable STAKING_PERCENTAGE_DURATION;
 
@@ -922,10 +950,10 @@ contract DuringStaking1_WithoutWithdral_ is DepositSetup1 {
     }
 
     function setUp() public override {
-        debugLog("DuringStaking1_WithoutWithdral_ setUp() start");
+        debugLog("DuringStaking1_WithWithdral setUp() start");
         DepositSetup1.setUp();
-        // console.log("DuringStaking1_WithoutWithdral_");
-        debugLog("DuringStaking1_WithoutWithdral_ setUp() end");
+        // console.log("DuringStaking1_WithWithdral");
+        debugLog("DuringStaking1_WithWithdral setUp() end");
     }
 
     function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
@@ -970,8 +998,18 @@ contract DuringStaking1_WithoutWithdral_ is DepositSetup1 {
     //     vm.warp( getStakingTimeReached() );
     // }
 
-    function checkStakingPeriod() public {
-        uint256 stakingTimeReached = getStakingTimeReached();
+    // function checkStakingPeriod() public {
+    //     uint256 stakingTimeReached = getStakingTimeReached();
+    //     uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
+    //     // verboseLog( "stakingTimeReached", stakingTimeReached );
+    //     // verboseLog( "lastTimeReward", lastTimeReward );
+    //     assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+    //     assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    // }
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
         uint256 lastTimeReward = stakingRewards.lastTimeRewardApplicable();
         // verboseLog( "stakingTimeReached", stakingTimeReached );
         // verboseLog( "lastTimeReward", lastTimeReward );
@@ -1015,10 +1053,15 @@ contract DuringStaking1_WithoutWithdral_ is DepositSetup1 {
         checkRewardPerToken(0 , 0);
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
-        // gotoStakingPeriod();
-        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         checkUsersStake();
-        checkStakingPeriod();
+        verboseLog( "Staking duration STAKING_PERCENTAGE_DURATION / 2 %% : ", STAKING_PERCENTAGE_DURATION / 2 );
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / 2 );
+        // checkStakingPeriod();
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION / 2 );
+
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
+        // checkStakingPeriod();
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 0 );
@@ -1144,43 +1187,40 @@ contract DuringStaking3_WithoutWithdral_100 is DuringStaking3_WithoutWithdral(10
 // contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(220) {
 // }
 
-// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
-// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
-// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
-// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
-contract DuringStaking1_WithoutWithdral_0_ is DuringStaking1_WithoutWithdral_(0) {
+// ------------------------------------
+contract DuringStaking1_WithWithdral0 is DuringStaking1_WithWithdral(0) {
 }
-contract DuringStaking1_WithoutWithdral_10_ is DuringStaking1_WithoutWithdral_(10) {
+contract DuringStaking1_WithWithdral10 is DuringStaking1_WithWithdral(10) {
 }
-// contract DuringStaking1_WithoutWithdral_20_ is DuringStaking1_WithoutWithdral_(20) {
+// contract DuringStaking1_WithWithdral20 is DuringStaking1_WithWithdral(20) {
 // }
-// contract DuringStaking1_WithoutWithdral_30_ is DuringStaking1_WithoutWithdral_(30) {
+// contract DuringStaking1_WithWithdral30 is DuringStaking1_WithWithdral(30) {
 // }
-// contract DuringStaking1_WithoutWithdral_33_ is DuringStaking1_WithoutWithdral_(33) {
+// contract DuringStaking1_WithWithdral33 is DuringStaking1_WithWithdral(33) {
 // }
-// contract DuringStaking1_WithoutWithdral_40 is DuringStaking1_WithoutWithdral_(40) {
+// contract DuringStaking1_WithWithdral40 is DuringStaking1_WithWithdral(40) {
 // }
-// contract DuringStaking1_WithoutWithdral_50_ is DuringStaking1_WithoutWithdral_(50) {
+// contract DuringStaking1_WithWithdral50 is DuringStaking1_WithWithdral(50) {
 // }
-// contract DuringStaking1_WithoutWithdral_60_ is DuringStaking1_WithoutWithdral_(60) {
+// contract DuringStaking1_WithWithdral60 is DuringStaking1_WithWithdral(60) {
 // }
-// contract DuringStaking1_WithoutWithdral_66_ is DuringStaking1_WithoutWithdral_(66) {
+// contract DuringStaking1_WithWithdral66 is DuringStaking1_WithWithdral(66) {
 // }
-// contract DuringStaking1_WithoutWithdral_70_ is DuringStaking1_WithoutWithdral_(70) {
+// contract DuringStaking1_WithWithdral70 is DuringStaking1_WithWithdral(70) {
 // }
-// contract DuringStaking1_WithoutWithdral_80_ is DuringStaking1_WithoutWithdral_(80) {
+// contract DuringStaking1_WithWithdral80 is DuringStaking1_WithWithdral(80) {
 // }
-// contract DuringStaking1_WithoutWithdral_90_ is DuringStaking1_WithoutWithdral_(90) {
+// contract DuringStaking1_WithWithdral90 is DuringStaking1_WithWithdral(90) {
 // }
-// contract DuringStaking1_WithoutWithdral_99_ is DuringStaking1_WithoutWithdral_(99) {
+// contract DuringStaking1_WithWithdral99 is DuringStaking1_WithWithdral(99) {
 // }
-contract DuringStaking1_WithoutWithdral_100_ is DuringStaking1_WithoutWithdral_(100) {
+contract DuringStaking1_WithWithdral100 is DuringStaking1_WithWithdral(100) {
 }
-contract DuringStaking1_WithoutWithdral_110_ is DuringStaking1_WithoutWithdral_(110) {
+contract DuringStaking1_WithWithdral110 is DuringStaking1_WithWithdral(110) {
 }
-// contract DuringStaking1_WithoutWithdral_150_ is DuringStaking1_WithoutWithdral_(150) {
+// contract DuringStaking1_WithWithdral150 is DuringStaking1_WithWithdral(150) {
 // }
-// contract DuringStaking1_WithoutWithdral_220_ is DuringStaking1_WithoutWithdral_(220) {
+// contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(220) {
 // }
 
 // --------------------------------------------------------
