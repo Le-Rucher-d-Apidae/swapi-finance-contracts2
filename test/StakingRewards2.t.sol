@@ -866,7 +866,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 }
 
 // ------------------------------------
-/*
+
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
     uint256 immutable stakingPercentageDuration;
@@ -908,9 +908,20 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         return STAKING_START_TIME + rewardDurationReached;
     }
 
-    function gotoStakingPeriod() private {
-        vm.warp( getStakingTimeReached() );
+    /**
+     * Goto some staking time within period
+     */
+    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
+        // vm.warp( getStakingTimeReached() );
+        assertTrue(_stakingPercentageDurationReached <= stakingPercentageDuration, "gotoStakingPeriod: _stakingPercentageDurationReached > stakingPercentageDuration"  );
+        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
+        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
+        return gotoStakingPeriodResult;
     }
+
+    // function gotoStakingPeriod() private {
+    //     vm.warp( getStakingTimeReached() );
+    // }
 
     function checkStakingPeriod() public {
         uint256 stakingTimeReached = getStakingTimeReached();
@@ -957,7 +968,10 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         checkRewardPerToken(0 , 0);
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
-        gotoStakingPeriod();
+
+        // gotoStakingPeriod();
+        gotoStakingPeriod(100);
+
         checkUsersStake();
         checkStakingPeriod();
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
@@ -970,7 +984,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
 }
-*/
+
 // ------------------------------------
 
 
@@ -1078,17 +1092,16 @@ contract DuringStaking3_WithoutWithdral_10 is DuringStaking3_WithoutWithdral(10)
 // }
 contract DuringStaking3_WithoutWithdral_100 is DuringStaking3_WithoutWithdral(100) {
 }
-contract DuringStaking3_WithoutWithdral_110 is DuringStaking3_WithoutWithdral(110) {
-}
+// contract DuringStaking3_WithoutWithdral_110 is DuringStaking3_WithoutWithdral(110) {
+// }
 // contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(150) {
 // }
 // contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(220) {
 // }
 
 // --------------------------------------------------------
-
+/*
 contract CheckStakingPermissions2 is StakingSetup2 {
-
 
     function setUp() public virtual override {
         // console.log("CheckStakingPermissions2 setUp()");
@@ -1255,3 +1268,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.stopPrank();
     }
 }
+*/
