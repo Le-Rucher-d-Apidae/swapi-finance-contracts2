@@ -556,11 +556,11 @@ contract DuringStaking1 is DepositSetup1 {
         assertEq( _stakeAmount, userStakedBalance );
     }
 
-    function checkAliceStakes() public {
+    function checkAliceStake() public {
         itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
     function checkUsersStake() public {
-        checkAliceStakes();
+        checkAliceStake();
     }
 
     function getRewardDurationReached() internal view returns (uint256) {
@@ -662,14 +662,14 @@ contract DuringStaking2 is DepositSetup2 {
         assertEq( _stakeAmount, userStakedBalance );
     }
 
-    function checkAliceStakes() public {
+    function checkAliceStake() public {
         itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
     function checkBobStake() public {
         itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
     }
     function checkUsersStake() public {
-        checkAliceStakes();
+        checkAliceStake();
         checkBobStake();
     }
 
@@ -773,7 +773,7 @@ contract DuringStaking3 is DepositSetup3 {
         assertEq( _stakeAmount, userStakedBalance );
     }
 
-    function checkAliceStakes() public {
+    function checkAliceStake() public {
         itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
     function checkBobStake() public {
@@ -783,7 +783,7 @@ contract DuringStaking3 is DepositSetup3 {
         itStakesCorrectly(userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Bob" );
     }
     function checkUsersStake() public {
-        checkAliceStakes();
+        checkAliceStake();
         checkBobStake();
         checkCherryStake();
     }
