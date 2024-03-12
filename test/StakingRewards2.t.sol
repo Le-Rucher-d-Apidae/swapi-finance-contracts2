@@ -867,19 +867,26 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 
 // ------------------------------------
 
-contract DuringStaking1_WithWithdral is DepositSetup1 {
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
 
-    uint256 immutable stakingPercentageDuration;
+// contract DuringStaking1_WithWithdral is DepositSetup1 {
+contract DuringStaking1_WithoutWithdral_ is DepositSetup1 {
+
+    uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
-        stakingPercentageDuration = _stakingPercentageDuration;
+        STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
     }
 
     function setUp() public override {
-        debugLog("DuringStaking1_WithWithdral setUp() start");
+        debugLog("DuringStaking1_WithoutWithdral_ setUp() start");
         DepositSetup1.setUp();
-        // console.log("DuringStaking1_WithWithdral");
-        debugLog("DuringStaking1_WithWithdral setUp() end");
+        // console.log("DuringStaking1_WithoutWithdral_");
+        debugLog("DuringStaking1_WithoutWithdral_ setUp() end");
     }
 
     function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
@@ -897,7 +904,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     }
 
     function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (stakingPercentageDuration >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * stakingPercentageDuration / 100);
+        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / 100);
         // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
         return rewardDurationReached;
     }
@@ -913,9 +920,10 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
      */
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= stakingPercentageDuration, "gotoStakingPeriod: _stakingPercentageDurationReached > stakingPercentageDuration"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= 100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / 100);
         verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
+        vm.warp(gotoStakingPeriodResult);
         return gotoStakingPeriodResult;
     }
 
@@ -970,12 +978,12 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         checkStakingTotalSupplyStaked();
 
         // gotoStakingPeriod();
-        gotoStakingPeriod(100);
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
 
         checkUsersStake();
         checkStakingPeriod();
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
-        verboseLog( "Staking duration %% : ", stakingPercentageDuration );
+        verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 0 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
             REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
@@ -1024,9 +1032,9 @@ contract DuringStaking1_WithoutWithdral_110 is DuringStaking1_WithoutWithdral(11
 // }
 // contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(220) {
 // }
-
+*/
 // ------------------------------------
-
+/*
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
 }
 contract DuringStaking2_WithoutWithdral_10 is DuringStaking2_WithoutWithdral(10) {
@@ -1063,7 +1071,7 @@ contract DuringStaking2_WithoutWithdral_110 is DuringStaking2_WithoutWithdral(11
 // }
 */
 // ------------------------------------
-
+/*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
 contract DuringStaking3_WithoutWithdral_10 is DuringStaking3_WithoutWithdral(10) {
@@ -1097,6 +1105,47 @@ contract DuringStaking3_WithoutWithdral_100 is DuringStaking3_WithoutWithdral(10
 // contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(150) {
 // }
 // contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(220) {
+// }
+*/
+
+
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+// TODO : DuringStaking1_WithoutWithdral_ ==> DuringStaking1_WithWithdral_
+contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral_(0) {
+}
+contract DuringStaking1_WithoutWithdral_10 is DuringStaking1_WithoutWithdral_(10) {
+}
+// contract DuringStaking1_WithoutWithdral_20 is DuringStaking1_WithoutWithdral_(20) {
+// }
+// contract DuringStaking1_WithoutWithdral_30 is DuringStaking1_WithoutWithdral_(30) {
+// }
+// contract DuringStaking1_WithoutWithdral_33 is DuringStaking1_WithoutWithdral_(33) {
+// }
+// contract DuringStaking1_WithoutWithdral_40 is DuringStaking1_WithoutWithdral_(40) {
+// }
+// contract DuringStaking1_WithoutWithdral_50 is DuringStaking1_WithoutWithdral_(50) {
+// }
+// contract DuringStaking1_WithoutWithdral_60 is DuringStaking1_WithoutWithdral_(60) {
+// }
+// contract DuringStaking1_WithoutWithdral_66 is DuringStaking1_WithoutWithdral_(66) {
+// }
+// contract DuringStaking1_WithoutWithdral_70 is DuringStaking1_WithoutWithdral_(70) {
+// }
+// contract DuringStaking1_WithoutWithdral_80 is DuringStaking1_WithoutWithdral_(80) {
+// }
+// contract DuringStaking1_WithoutWithdral_90 is DuringStaking1_WithoutWithdral_(90) {
+// }
+// contract DuringStaking1_WithoutWithdral_99 is DuringStaking1_WithoutWithdral_(99) {
+// }
+contract DuringStaking1_WithoutWithdral_100 is DuringStaking1_WithoutWithdral_(100) {
+}
+contract DuringStaking1_WithoutWithdral_110 is DuringStaking1_WithoutWithdral_(110) {
+}
+// contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral_(150) {
+// }
+// contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral_(220) {
 // }
 
 // --------------------------------------------------------
