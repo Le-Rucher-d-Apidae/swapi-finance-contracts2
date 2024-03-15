@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: UNLICENSED
+// pragma solidity >= 0.8.20 < 0.9.0;
+// pragma solidity ^0.8.23;
+// pragma solidity >= 0.8.20;
+// pragma solidity ^0.7.6;
+// pragma solidity >= 0.7.6 <= 0.8.0;
+// pragma solidity >= 0.7.6;
+pragma solidity >=0.8.0;
+
+// 1 %
+uint256 constant PERCENT_1    = 1e16;
+// 10 %
+uint256 constant PERCENT_10    = 1e17;
+// 20 %
+uint256 constant PERCENT_20    = 2e17;
+// 30 %
+uint256 constant PERCENT_30    = 3e17;
+// 33 %
+uint256 constant PERCENT_33    = 33e16;
+// 40 %
+uint256 constant PERCENT_40    = 4e17;
+// 50 %
+uint256 constant PERCENT_50    = 5e17;
+// 60 %
+uint256 constant PERCENT_60    = 6e17;
+// 66 %
+uint256 constant PERCENT_66    = 66e16;
+// 70 %
+uint256 constant PERCENT_70    = 7e17;
+// 80 %
+uint256 constant PERCENT_80    = 8e17;
+// 90 %
+uint256 constant PERCENT_90    = 9e17;
+// 99 %
+uint256 constant PERCENT_99    = 99e16;
+// 100 %
+uint256 constant PERCENT_100   = 1e18;
+// 101 %
+uint256 constant PERCENT_101   = 101e16;
+// 110 %
+uint256 constant PERCENT_110   = 11e17;
+// 120 %
+uint256 constant PERCENT_150   = 15e17;
+// 150 %
+uint256 constant PERCENT_220   = 22e17;
+// 200 %
