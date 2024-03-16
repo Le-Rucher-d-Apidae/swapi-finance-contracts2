@@ -265,7 +265,7 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
     // StakingRewards2 internal stakingRewards2;
     uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10 000 s.
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
 
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
 
@@ -653,7 +653,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
-        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 0 );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
             REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
@@ -763,8 +763,8 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
-        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
-        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
+        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
             REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
@@ -875,9 +875,9 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
-        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
-        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
-        checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , 31e14 );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_4 );
+        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
+        checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
             REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
@@ -891,7 +891,8 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
     uint256 immutable STAKING_PERCENTAGE_DURATION;
-    uint8 immutable DIVIDE = 2;
+    // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
+    uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -924,10 +925,31 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         return rewardDurationReached;
     }
 
+    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
+        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+
     function getStakingTimeReached() internal view returns (uint256) {
         uint256 rewardDurationReached = getRewardDurationReached();
         verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
         return STAKING_START_TIME + rewardDurationReached;
+    }
+
+    function getStakingDuration() internal view returns (uint256) {
+        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
+        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
+        return stakingDuration;
+    }
+
+    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
+        uint256 stakingDuration = getStakingDuration() / _divide;
+        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
+        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
+        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
+        return rewardedStakingDuration;
     }
 
     /**
@@ -968,16 +990,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
 
-        // verboseLog( "expectedStakingRewards _stakedAmount: ", _stakedAmount);
-        // verboseLog( "expectedStakingRewards _rewardDurationReached: ", _rewardDurationReached );
-        // verboseLog( "expectedStakingRewards _rewardTotalDuration: ", _rewardTotalDuration);
-        // verboseLog( "expectedStakingRewards rewardsDuration: ", rewardsDuration);
-        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT: ", REWARD_INITIAL_AMOUNT);
-        // verboseLog( "expectedStakingRewards TOTAL_STAKED_AMOUNT: ", TOTAL_STAKED_AMOUNT);
-        // verboseLog( "expectedStakingRewards rewardsDuration == _rewardTotalDuration: ", (rewardsDuration == _rewardTotalDuration ? 1 : 0) );
-        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration: ", REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration );
-        // verboseLog( "expectedStakingRewards REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT: ", REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT );
-
         return (rewardsDuration == _rewardTotalDuration ?
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
@@ -1006,22 +1018,12 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         // Alice withdraws all
         withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
         uint256 userAliceStakingElapsedTime = block.timestamp - STAKING_START_TIME;
-// verboseLog( "testUsersStakingRewards: userAliceStakingElapsedTime = ", userAliceStakingElapsedTime );
-        // withdrawStake( userAlice, 1 );
-
-        uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-            REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
-        verboseLog( "==> expectedRewardPerToken = ", expectedRewardPerToken );
-        expectedRewardPerToken /= DIVIDE;
-        verboseLog( "==> expectedRewardPerToken = ", expectedRewardPerToken );
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
-// verboseLog( "testUsersStakingRewards: gotoStakingPeriod : staking current time =", block.timestamp - STAKING_START_TIME );
-        // checkStakingPeriod( STAKING_PERCENTAGE_DURATION );
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
 
-        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, userAliceStakingElapsedTime, REWARD_INITIAL_DURATION ) , 0 );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, userAliceStakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
 }
@@ -1036,7 +1038,12 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
 
 // ----------------------------------------------------------------------------
 
+
+// 1 staker deposits right after staking starts and keeps staked amount until the end of staking period
+
 contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral(0) {
+}
+contract DuringStaking1_WithoutWithdral_1 is DuringStaking1_WithoutWithdral(PERCENT_1) {
 }
 contract DuringStaking1_WithoutWithdral_10 is DuringStaking1_WithoutWithdral(PERCENT_10) {
 }
@@ -1075,7 +1082,11 @@ contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PE
 
 // ------------------------------------
 
+// 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
+
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
+}
+contract DuringStaking2_WithoutWithdral_1 is DuringStaking2_WithoutWithdral(PERCENT_1) {
 }
 contract DuringStaking2_WithoutWithdral_10 is DuringStaking2_WithoutWithdral(PERCENT_10) {
 }
@@ -1114,7 +1125,11 @@ contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PE
 
 // ------------------------------------
 
+// 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
+
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
+}
+contract DuringStaking3_WithoutWithdral_1 is DuringStaking3_WithoutWithdral(PERCENT_1) {
 }
 contract DuringStaking3_WithoutWithdral_10 is DuringStaking3_WithoutWithdral(PERCENT_10) {
 }
@@ -1153,8 +1168,11 @@ contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PE
 
 // ------------------------------------
 
-/*
+// 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
+
 contract DuringStaking1_WithWithdral0 is DuringStaking1_WithWithdral(0) {
+}
+contract DuringStaking1_WithWithdral1 is DuringStaking1_WithWithdral(PERCENT_1) {
 }
 contract DuringStaking1_WithWithdral10 is DuringStaking1_WithWithdral(PERCENT_10) {
 }
@@ -1188,11 +1206,17 @@ contract DuringStaking1_WithWithdral110 is DuringStaking1_WithWithdral(PERCENT_1
 }
 contract DuringStaking1_WithWithdral150 is DuringStaking1_WithWithdral(PERCENT_150) {
 }
+contract DuringStaking1_WithWithdral190 is DuringStaking1_WithWithdral(PERCENT_190) {
+}
+contract DuringStaking1_WithWithdral200 is DuringStaking1_WithWithdral(PERCENT_200) {
+}
+contract DuringStaking1_WithWithdral201 is DuringStaking1_WithWithdral(PERCENT_201) {
+}
 contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(PERCENT_220) {
 }
-*/
+
 // --------------------------------------------------------
-/*
+
 contract CheckStakingPermissions2 is StakingSetup2 {
 
     function setUp() public virtual override {
@@ -1360,4 +1384,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.stopPrank();
     }
 }
-*/
+
