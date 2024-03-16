@@ -8,39 +8,54 @@
 pragma solidity >=0.8.0;
 
 // 1 %
-uint256 constant PERCENT_1    = 1e16;
+uint256 constant PERCENT_1      = 1e16;
 // 10 %
-uint256 constant PERCENT_10    = 1e17;
+uint256 constant PERCENT_10     = 1e17;
 // 20 %
-uint256 constant PERCENT_20    = 2e17;
+uint256 constant PERCENT_20     = 2e17;
 // 30 %
-uint256 constant PERCENT_30    = 3e17;
+uint256 constant PERCENT_30     = 3e17;
 // 33 %
-uint256 constant PERCENT_33    = 33e16;
+uint256 constant PERCENT_33     = 33e16;
 // 40 %
-uint256 constant PERCENT_40    = 4e17;
+uint256 constant PERCENT_40     = 4e17;
 // 50 %
-uint256 constant PERCENT_50    = 5e17;
+uint256 constant PERCENT_50     = 5e17;
 // 60 %
-uint256 constant PERCENT_60    = 6e17;
+uint256 constant PERCENT_60     = 6e17;
 // 66 %
-uint256 constant PERCENT_66    = 66e16;
+uint256 constant PERCENT_66     = 66e16;
 // 70 %
-uint256 constant PERCENT_70    = 7e17;
+uint256 constant PERCENT_70     = 7e17;
 // 80 %
-uint256 constant PERCENT_80    = 8e17;
+uint256 constant PERCENT_80     = 8e17;
 // 90 %
-uint256 constant PERCENT_90    = 9e17;
+uint256 constant PERCENT_90     = 9e17;
 // 99 %
-uint256 constant PERCENT_99    = 99e16;
+uint256 constant PERCENT_99     = 99e16;
 // 100 %
-uint256 constant PERCENT_100   = 1e18;
+uint256 constant PERCENT_100    = 1e18;
+
 // 101 %
-uint256 constant PERCENT_101   = 101e16;
+uint256 constant PERCENT_101    = 101e16;
+
 // 110 %
-uint256 constant PERCENT_110   = 11e17;
-// 120 %
-uint256 constant PERCENT_150   = 15e17;
+uint256 constant PERCENT_110    = 11e17;
 // 150 %
-uint256 constant PERCENT_220   = 22e17;
+uint256 constant PERCENT_150    = 15e17;
+// 190 %
+uint256 constant PERCENT_190    = 19e17;
+
 // 200 %
+uint256 constant PERCENT_200    = 2e18;
+// 201 %
+uint256 constant PERCENT_201    = 201e16;
+// 220 %
+uint256 constant PERCENT_220    = 22e17;
+
+
+uint256 constant DELTA_0    = 0; // % Delta: 0
+uint256 constant DELTA_0_31 = 31e14; // % Delta: 0.310000000000000000
+uint256 constant DELTA_0_4  = 4e15; // % Delta: 0.400000000000000000
+
+
