@@ -888,6 +888,8 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 
 // ------------------------------------
 
+// 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
+
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
     uint256 immutable STAKING_PERCENTAGE_DURATION;
@@ -1012,11 +1014,13 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         checkUsersStake();
-        verboseLog( "Staking duration STAKING_PERCENTAGE_DURATION / 2 %% : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
+        verboseLog( "Staking duration (%%) = STAKING_PERCENTAGE_DURATION / 2  : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
         checkStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+
         // Alice withdraws all
         withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
+
         uint256 userAliceStakingElapsedTime = block.timestamp - STAKING_START_TIME;
         uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
@@ -1024,23 +1028,334 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
 
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, userAliceStakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
+
+        checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
+    }
+}
+
+// ------------------------------------
+// 2 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
+
+contract DuringStaking2_WithWithdral is DepositSetup2 {
+
+    uint256 immutable STAKING_PERCENTAGE_DURATION;
+    // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
+    uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
+
+    constructor (uint256 _stakingPercentageDuration) {
+        STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
+    }
+
+    function setUp() public override {
+        debugLog("DuringStaking2_WithWithdral setUp() start");
+        DepositSetup2.setUp();
+        // console.log("DuringStaking2_WithWithdral");
+        debugLog("DuringStaking2_WithWithdral setUp() end");
+    }
+
+    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
+        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
+        verboseLog(_userName);
+        verboseLog(" staked balance: ", userStakedBalance);
+        assertEq( _stakeAmount, userStakedBalance );
+    }
+
+    function checkAliceStake() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
+    function checkBobStake() public {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkUsersStake() public {
+        checkAliceStake();
+        checkBobStake();
+    }
+
+    function getRewardDurationReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
+        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+
+    function getStakingTimeReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = getRewardDurationReached();
+        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
+        return STAKING_START_TIME + rewardDurationReached;
+    }
+
+    function getStakingDuration() internal view returns (uint256) {
+        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
+        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
+        return stakingDuration;
+    }
+
+    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
+        uint256 stakingDuration = getStakingDuration() / _divide;
+        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
+        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
+        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
+        return rewardedStakingDuration;
+    }
+
+    /**
+     * Goto some staking time within period
+     */
+    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
+        // vm.warp( getStakingTimeReached() );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
+        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
+        vm.warp(gotoStakingPeriodResult);
+        return gotoStakingPeriodResult;
+    }
+
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
+        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
+        // verboseLog( "stakingTimeReached", stakingTimeReached );
+        // verboseLog( "lastTimeReward", lastTimeReward );
+        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    }
+
+    function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
+
+        uint256 stakerRewards = stakingRewards2.earned( _staker );
+        if (_delta == 0) {
+            assertEq( stakerRewards, _expectedRewardAmount );
+        } else {
+            assertApproxEqRel( stakerRewards, _expectedRewardAmount, _delta );
+        }
+        verboseLog( _stakerName );
+        verboseLog( " rewards: ",  stakerRewards);
+    }
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+        uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+
+        return (rewardsDuration == _rewardTotalDuration ?
+            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
+        );
+    }
+
+    function withdrawStake(address _user, uint256 _amount) public {
+        uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
+        // Check emitted event
+        vm.expectEmit(true,true,false,false, address(stakingRewards2));
+        emit StakingRewards2.Withdrawn( _user, _amount );
+        vm.prank(_user);
+        stakingRewards2.withdraw( _amount );
+        uint256 balanceOfUserAfterWithdrawal = stakingRewards2.balanceOf(_user);
+        assertEq( balanceOfUserBeforeWithdrawal - _amount, balanceOfUserAfterWithdrawal );
+    }
+
+    function testUsersStakingRewards() public {
+        checkRewardPerToken( 0 , 0 );
+        checkRewardForDuration();
+        checkStakingTotalSupplyStaked();
+        checkUsersStake();
+        verboseLog( "Staking duration (%%) = STAKING_PERCENTAGE_DURATION / 2  : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+
+        // Alice withdraws all
+        withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
+        // Bob withdraws all
+        withdrawStake( userBob, BOB_STAKINGERC20_STAKEDAMOUNT );
+
+        uint256 usersStakingElapsedTime = block.timestamp - STAKING_START_TIME;
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
+
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
+        verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
+
+        uint256 delta = STAKING_PERCENTAGE_DURATION < PERCENT_10 ? DELTA_0_4 : DELTA_0_04; // Longer staking period = better accuracy : less delta
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
+        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
+
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
 }
 
 // ------------------------------------
 
-contract DuringStaking2_WithWithdral is DepositSetup2 {
-}
+// TODO
+// 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 
 contract DuringStaking3_WithWithdral is DepositSetup3 {
+
+    uint256 immutable STAKING_PERCENTAGE_DURATION;
+    // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
+    uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
+
+    constructor (uint256 _stakingPercentageDuration) {
+        STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
+    }
+
+    function setUp() public override {
+        debugLog("DuringStaking3_WithWithdral setUp() start");
+        DepositSetup3.setUp();
+        // console.log("DuringStaking3_WithWithdral");
+        debugLog("DuringStaking3_WithWithdral setUp() end");
+    }
+
+    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
+        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
+        verboseLog(_userName);
+        verboseLog(" staked balance: ", userStakedBalance);
+        assertEq( _stakeAmount, userStakedBalance );
+    }
+
+    function checkAliceStake() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
+    function checkBobStake() public {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkCherryStake() public {
+        itStakesCorrectly( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Cherry" );
+    }
+    function checkUsersStake() public {
+        checkAliceStake();
+        checkBobStake();
+        checkCherryStake();
+    }
+
+    function getRewardDurationReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
+        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
+        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
+        return rewardDurationReached;
+    }
+
+
+    function getStakingTimeReached() internal view returns (uint256) {
+        uint256 rewardDurationReached = getRewardDurationReached();
+        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
+        return STAKING_START_TIME + rewardDurationReached;
+    }
+
+    function getStakingDuration() internal view returns (uint256) {
+        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
+        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
+        return stakingDuration;
+    }
+
+    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
+        uint256 stakingDuration = getStakingDuration() / _divide;
+        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
+        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
+        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
+        return rewardedStakingDuration;
+    }
+
+    /**
+     * Goto some staking time within period
+     */
+    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
+        // vm.warp( getStakingTimeReached() );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
+        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
+        vm.warp(gotoStakingPeriodResult);
+        return gotoStakingPeriodResult;
+    }
+
+    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        // uint256 stakingTimeReached = getStakingTimeReached();
+        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
+        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
+        // verboseLog( "stakingTimeReached", stakingTimeReached );
+        // verboseLog( "lastTimeReward", lastTimeReward );
+        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
+        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
+    }
+
+    function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
+
+        uint256 stakerRewards = stakingRewards2.earned( _staker );
+        if (_delta == 0) {
+            assertEq( stakerRewards, _expectedRewardAmount );
+        } else {
+            assertApproxEqRel( stakerRewards, _expectedRewardAmount, _delta );
+        }
+        verboseLog( _stakerName );
+        verboseLog( " rewards: ",  stakerRewards);
+    }
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+        uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+
+        return (rewardsDuration == _rewardTotalDuration ?
+            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
+        );
+    }
+
+    function withdrawStake(address _user, uint256 _amount) public {
+        uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
+        // Check emitted event
+        vm.expectEmit(true,true,false,false, address(stakingRewards2));
+        emit StakingRewards2.Withdrawn( _user, _amount );
+        vm.prank(_user);
+        stakingRewards2.withdraw( _amount );
+        uint256 balanceOfUserAfterWithdrawal = stakingRewards2.balanceOf(_user);
+        assertEq( balanceOfUserBeforeWithdrawal - _amount, balanceOfUserAfterWithdrawal );
+    }
+
+    function testUsersStakingRewards() public {
+        checkRewardPerToken( 0 , 0 );
+        checkRewardForDuration();
+        checkStakingTotalSupplyStaked();
+        checkUsersStake();
+        verboseLog( "Staking duration (%%) = STAKING_PERCENTAGE_DURATION / 2  : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+        checkStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+
+        // Alice withdraws all
+        withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
+        // Bob withdraws all
+        withdrawStake( userBob, BOB_STAKINGERC20_STAKEDAMOUNT );
+        // Cherry withdraws all
+        withdrawStake( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT );
+
+        uint256 usersStakingElapsedTime = block.timestamp - STAKING_START_TIME;
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
+
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
+        verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
+
+        uint256 delta = STAKING_PERCENTAGE_DURATION < PERCENT_10 ? DELTA_0_4 : DELTA_0_04; // Longer staking period = better accuracy : less delta
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
+        checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
+        checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
+
+        checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
+    }
 }
+
 
 // ----------------------------------------------------------------------------
 
 
 // 1 staker deposits right after staking starts and keeps staked amount until the end of staking period
-
+/*
 contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral(0) {
 }
 contract DuringStaking1_WithoutWithdral_1 is DuringStaking1_WithoutWithdral(PERCENT_1) {
@@ -1079,11 +1394,11 @@ contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral(PE
 }
 contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PERCENT_220) {
 }
-
+*/
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
-
+/*
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
 }
 contract DuringStaking2_WithoutWithdral_1 is DuringStaking2_WithoutWithdral(PERCENT_1) {
@@ -1122,11 +1437,11 @@ contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
-
+*/
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
-
+/*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
 contract DuringStaking3_WithoutWithdral_1 is DuringStaking3_WithoutWithdral(PERCENT_1) {
@@ -1165,11 +1480,11 @@ contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PE
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
-
+*/
 // ------------------------------------
 
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
-
+/*
 contract DuringStaking1_WithWithdral0 is DuringStaking1_WithWithdral(0) {
 }
 contract DuringStaking1_WithWithdral1 is DuringStaking1_WithWithdral(PERCENT_1) {
@@ -1214,9 +1529,108 @@ contract DuringStaking1_WithWithdral201 is DuringStaking1_WithWithdral(PERCENT_2
 }
 contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(PERCENT_220) {
 }
+*/
+// ------------------------------------
+
+// 2 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
+/*
+contract DuringStaking2_WithWithdral0 is DuringStaking2_WithWithdral(0) {
+}
+contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) {
+}
+contract DuringStaking2_WithWithdral10 is DuringStaking2_WithWithdral(PERCENT_10) {
+}
+contract DuringStaking2_WithWithdral20 is DuringStaking2_WithWithdral(PERCENT_20) {
+}
+contract DuringStaking2_WithWithdral30 is DuringStaking2_WithWithdral(PERCENT_30) {
+}
+contract DuringStaking2_WithWithdral33 is DuringStaking2_WithWithdral(PERCENT_33) {
+}
+contract DuringStaking2_WithWithdral40 is DuringStaking2_WithWithdral(PERCENT_40) {
+}
+contract DuringStaking2_WithWithdral50 is DuringStaking2_WithWithdral(PERCENT_50) {
+}
+contract DuringStaking2_WithWithdral60 is DuringStaking2_WithWithdral(PERCENT_60) {
+}
+contract DuringStaking2_WithWithdral66 is DuringStaking2_WithWithdral(PERCENT_66) {
+}
+contract DuringStaking2_WithWithdral70 is DuringStaking2_WithWithdral(PERCENT_70) {
+}
+contract DuringStaking2_WithWithdral80 is DuringStaking2_WithWithdral(PERCENT_80) {
+}
+contract DuringStaking2_WithWithdral90 is DuringStaking2_WithWithdral(PERCENT_90) {
+}
+contract DuringStaking2_WithWithdral99 is DuringStaking2_WithWithdral(PERCENT_99) {
+}
+contract DuringStaking2_WithWithdral100 is DuringStaking2_WithWithdral(PERCENT_100) {
+}
+contract DuringStaking2_WithWithdral101 is DuringStaking2_WithWithdral(PERCENT_101) {
+}
+contract DuringStaking2_WithWithdral110 is DuringStaking2_WithWithdral(PERCENT_110) {
+}
+contract DuringStaking2_WithWithdral150 is DuringStaking2_WithWithdral(PERCENT_150) {
+}
+contract DuringStaking2_WithWithdral190 is DuringStaking2_WithWithdral(PERCENT_190) {
+}
+contract DuringStaking2_WithWithdral200 is DuringStaking2_WithWithdral(PERCENT_200) {
+}
+contract DuringStaking2_WithWithdral201 is DuringStaking2_WithWithdral(PERCENT_201) {
+}
+contract DuringStaking2_WithWithdral220 is DuringStaking2_WithWithdral(PERCENT_220) {
+}
+*/
+// ------------------------------------
+
+// 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
+
+contract DuringStaking3_WithWithdral0 is DuringStaking3_WithWithdral(0) {
+}
+contract DuringStaking3_WithWithdral1 is DuringStaking3_WithWithdral(PERCENT_1) {
+}
+contract DuringStaking3_WithWithdral10 is DuringStaking3_WithWithdral(PERCENT_10) {
+}
+contract DuringStaking3_WithWithdral20 is DuringStaking3_WithWithdral(PERCENT_20) {
+}
+contract DuringStaking3_WithWithdral30 is DuringStaking3_WithWithdral(PERCENT_30) {
+}
+contract DuringStaking3_WithWithdral33 is DuringStaking3_WithWithdral(PERCENT_33) {
+}
+contract DuringStaking3_WithWithdral40 is DuringStaking3_WithWithdral(PERCENT_40) {
+}
+contract DuringStaking3_WithWithdral50 is DuringStaking3_WithWithdral(PERCENT_50) {
+}
+contract DuringStaking3_WithWithdral60 is DuringStaking3_WithWithdral(PERCENT_60) {
+}
+contract DuringStaking3_WithWithdral66 is DuringStaking3_WithWithdral(PERCENT_66) {
+}
+contract DuringStaking3_WithWithdral70 is DuringStaking3_WithWithdral(PERCENT_70) {
+}
+contract DuringStaking3_WithWithdral80 is DuringStaking3_WithWithdral(PERCENT_80) {
+}
+contract DuringStaking3_WithWithdral90 is DuringStaking3_WithWithdral(PERCENT_90) {
+}
+contract DuringStaking3_WithWithdral99 is DuringStaking3_WithWithdral(PERCENT_99) {
+}
+contract DuringStaking3_WithWithdral100 is DuringStaking3_WithWithdral(PERCENT_100) {
+}
+contract DuringStaking3_WithWithdral101 is DuringStaking3_WithWithdral(PERCENT_101) {
+}
+contract DuringStaking3_WithWithdral110 is DuringStaking3_WithWithdral(PERCENT_110) {
+}
+contract DuringStaking3_WithWithdral150 is DuringStaking3_WithWithdral(PERCENT_150) {
+}
+contract DuringStaking3_WithWithdral190 is DuringStaking3_WithWithdral(PERCENT_190) {
+}
+contract DuringStaking3_WithWithdral200 is DuringStaking3_WithWithdral(PERCENT_200) {
+}
+contract DuringStaking3_WithWithdral201 is DuringStaking3_WithWithdral(PERCENT_201) {
+}
+contract DuringStaking3_WithWithdral220 is DuringStaking3_WithWithdral(PERCENT_220) {
+}
 
 // --------------------------------------------------------
 
+/*
 contract CheckStakingPermissions2 is StakingSetup2 {
 
     function setUp() public virtual override {
@@ -1384,4 +1798,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.stopPrank();
     }
 }
-
+*/

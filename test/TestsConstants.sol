@@ -54,8 +54,9 @@ uint256 constant PERCENT_201    = 201e16;
 uint256 constant PERCENT_220    = 22e17;
 
 
-uint256 constant DELTA_0    = 0; // % Delta: 0
-uint256 constant DELTA_0_31 = 31e14; // % Delta: 0.310000000000000000
-uint256 constant DELTA_0_4  = 4e15; // % Delta: 0.400000000000000000
+uint256 constant DELTA_0    = 0;        // % Delta: 0.000000000000000000
+uint256 constant DELTA_0_04 = 4e14;     // % Delta: 0.040000000000000000
+uint256 constant DELTA_0_31 = 31e14;    // % Delta: 0.310000000000000000
+uint256 constant DELTA_0_4  = 4e15;     // % Delta: 0.400000000000000000
 
 
