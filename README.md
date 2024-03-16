@@ -31,3 +31,8 @@ If you need to use any of the contract ABIs, you can install this repo as an npm
 These contracts were adapted from these repos:
 My Baker baguette-exchange : [contracts] (https://github.com/baguette-exchange/contracts)
 Uniswap : [uniswap-v2-core](https://github.com/solidity-uniswap-lib/uniswap-v2-core), [uniswap-v2-periphery](https://github.com/solidity-uniswap-lib/uniswap-v2-core), and [uniswap-lib](https://github.com/solidity-uniswap-lib/uniswap-lib).
+
+Synthetix's StakingRewards:
+https://github.com/Synthetixio/synthetix/blob/v2.98.2/contracts/StakingRewards.sol
+Tests:
+https://github.com/Synthetixio/synthetix/blob/v2.98.2/test/contracts/StakingRewards.js
