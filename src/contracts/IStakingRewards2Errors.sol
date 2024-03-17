@@ -25,7 +25,8 @@ interface IStakingRewards2Errors {
      * @dev Provided reward too high (insufficient balance in staking contract).
      * @param reward amount.
      */
-    error ProvidedRewardTooHigh(uint256 reward);
+    // error ProvidedRewardTooHigh(uint256 reward);
+    error ProvidedRewardTooHigh(uint256 reward, uint256 rewardBalance, uint256 rewardsDuration);
 
     /**
      * @dev Rewards can't be zero address
@@ -67,7 +68,7 @@ interface IStakingRewards2Errors {
     /**
      * @dev Provided reward too high (insufficient balance in staking contract).
      */
-    error ProvidedVariableRewardTooHigh(uint256 constantRewardPerTokenStored, uint256 variableRewardMaxTotalSupply, uint256 balance);
+    error ProvidedVariableRewardTooHigh(uint256 constantRewardPerTokenStored, uint256 variableRewardMaxTotalSupply, uint256 rewardBalance);
 
     /**
      * @dev Total supply exceeds allowed max
