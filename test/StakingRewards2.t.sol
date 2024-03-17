@@ -548,9 +548,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         return STAKING_START_TIME + rewardDurationReached;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
@@ -655,9 +653,7 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         return STAKING_START_TIME + rewardDurationReached;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
@@ -769,9 +765,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         return STAKING_START_TIME + rewardDurationReached;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
@@ -899,9 +893,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         return rewardedStakingDuration;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
@@ -1049,9 +1041,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         return rewardedStakingDuration;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
@@ -1134,7 +1124,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
 
 // ------------------------------------
 
-// TODO
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 
 contract DuringStaking3_WithWithdral is DepositSetup3 {
@@ -1209,9 +1198,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         return rewardedStakingDuration;
     }
 
-    /**
-     * Goto some staking time within period
-     */
+    // Goto some staking time within period
     function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
         // vm.warp( getStakingTimeReached() );
         assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
