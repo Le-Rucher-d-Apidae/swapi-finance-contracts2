@@ -1647,9 +1647,6 @@ contract CheckStakingPermissions2 is StakingSetup2 {
 
     function testStakingNotifyRewardAmount() public {
 
-        vm.prank(erc20Minter);
-        rewardErc20.mint( address(stakingRewards2), REWARD_INITIAL_AMOUNT );
-
         vm.prank(userAlice);
         vm.expectRevert(
             abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
