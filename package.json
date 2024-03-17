@@ -40,6 +40,7 @@
     "forgeTestMyERC20": "forge test -vvv --match-path test/sampleTests/MyERC20.t.sol",
     "forgeTestAptErc20": "forge test -vvv --match-path test/AptErc20.t.sol",
     "forgeTestStakingRewards2": "forge test -vvv --match-path test/StakingRewards2.t.sol",
+    "forgeTestStakingRewards2c": "forge test -vvv --match-path test/StakingRewards2_constantReward.t.sol",
     "forgeTest": "forge test ",
     "test:coverage": "forge coverage",
     "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
