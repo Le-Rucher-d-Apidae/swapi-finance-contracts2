@@ -248,6 +248,10 @@ contract Erc20Setup3 is UsersSetup3 {
 
 contract StakingSetup is TestLog {
 
+    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
+    uint256 immutable STAKING_START_TIME = block.timestamp;
+
     StakingRewards2 internal stakingRewards2;
 
     function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
@@ -264,12 +268,7 @@ contract StakingSetup is TestLog {
 }
 contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
-
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
-
-    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     function setUp() public virtual override {
         // console.log("StakingSetup1 setUp()");
@@ -315,13 +314,8 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
 contract StakingSetup2 is Erc20Setup2, StakingSetup {
 
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10 000 s.
-
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
-
-    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     function setUp() public virtual override {
         // console.log("StakingSetup2 setUp()");
@@ -369,14 +363,9 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
 
 contract StakingSetup3 is Erc20Setup3, StakingSetup {
 
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10 000 s.
-
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant CHERRY_STAKINGERC20_STAKEDAMOUNT = CHERRY_STAKINGERC20_MINTEDAMOUNT;
-
-    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     function setUp() public virtual override {
         // console.log("StakingSetup3 setUp()");
