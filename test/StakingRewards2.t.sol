@@ -1645,7 +1645,9 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.stopPrank();
     }
 
-    function testStakingNotifyRewardAmount() public {
+    function testStakingNotifyRewardAmountMin() public {
+
+        // vm.warp( STAKING_START_TIME ); // start of staking period
 
         vm.prank(userAlice);
         vm.expectRevert(
@@ -1669,8 +1671,68 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.expectEmit(true,false,false,false, address(stakingRewards2));
         emit StakingRewards2.RewardAdded( 1 );
         stakingRewards2.notifyRewardAmount( 1 );
-        verboseLog( "Staking contract: Only owner can notifyRewardAmount" );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", 1 );
         verboseLog( "Staking contract: Event RewardAdded emitted" );
+    }
+
+    function testStakingNotifyRewardAmount0() public {
+
+        // vm.warp( STAKING_START_TIME ); // start of staking period
+
+        vm.prank(userStakingRewardAdmin);
+        // Check emitted event
+        vm.expectEmit(true,false,false,false, address(stakingRewards2));
+        emit StakingRewards2.RewardAdded( 0 );
+        stakingRewards2.notifyRewardAmount( 0 );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", 0 );
+        verboseLog( "Staking contract: Event RewardAdded emitted" );
+
+    }
+
+    function testStakingNotifyRewardAmountLimit() public {
+
+        // vm.warp( STAKING_START_TIME ); // start of staking period
+        uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION; // computed  reward rate must exceed by at least one unit for raising an error
+        vm.prank(userStakingRewardAdmin);
+        // Check emitted event
+        vm.expectEmit(true,false,false,false, address(stakingRewards2));
+        emit StakingRewards2.RewardAdded( rewardAmountToAddForRaisingError -1 );
+        stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError -1 );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", rewardAmountToAddForRaisingError );
+        verboseLog( "Staking contract: Event RewardAdded emitted" );
+
+    }
+
+    // function testStakingNotifyRewardAmountMax() public {
+
+    //     // Mint reward ERC20 a second time
+    //     vm.prank(erc20Minter);
+    //     rewardErc20.mint( address(stakingRewards2), REWARD_INITIAL_AMOUNT );
+
+    //     vm.warp( STAKING_START_TIME ); // start of staking period
+
+    //     vm.prank(userStakingRewardAdmin);
+    //     // Check emitted event
+    //     vm.expectEmit(true,false,false,false, address(stakingRewards2));
+    //     emit StakingRewards2.RewardAdded( REWARD_INITIAL_AMOUNT );
+    //     stakingRewards2.notifyRewardAmount( REWARD_INITIAL_AMOUNT );
+    //     verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", REWARD_INITIAL_AMOUNT );
+    //     verboseLog( "Staking contract: Event RewardAdded emitted" );
+
+    // }
+
+    function testStakingRewardAmountTooHigh() public {
+
+        // vm.warp( STAKING_START_TIME ); // start of staking period
+        uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION;  // computed  reward rate must exceed by at least one unit for raising an error
+
+       vm.prank(userStakingRewardAdmin);
+        // Check revert
+        vm.expectRevert(
+            abi.encodeWithSelector( IStakingRewards2Errors.ProvidedRewardTooHigh.selector, rewardAmountToAddForRaisingError, REWARD_INITIAL_AMOUNT, REWARD_INITIAL_DURATION )
+        );
+        stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError );
+        verboseLog( "Staking contract: Not enough reward balance" );
     }
 
     function testStakingSetRewardsDuration() public {
@@ -1682,7 +1744,7 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.expectRevert(
             abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
         );
-        verboseLog( "Only staking reward contract owner can notifyRewardAmount" );
+        verboseLog( "Only staking reward contract owner can setRewardsDuration" );
 
         stakingRewards2.setRewardsDuration( 1 );
         verboseLog( "Staking contract: Alice can't setRewardsDuration" );
