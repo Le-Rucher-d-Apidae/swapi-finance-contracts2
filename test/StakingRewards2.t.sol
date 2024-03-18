@@ -1647,13 +1647,12 @@ contract CheckStakingPermissions2 is StakingSetup2 {
 
     function testStakingNotifyRewardAmountMin() public {
 
-        // vm.warp( STAKING_START_TIME ); // start of staking period
+        verboseLog( "Only staking reward contract owner can notifyRewardAmount" );
 
         vm.prank(userAlice);
         vm.expectRevert(
             abi.encodeWithSelector( Ownable.OwnableUnauthorizedAccount.selector, userAlice )
         );
-        verboseLog( "Only staking reward contract owner can notifyRewardAmount" );
 
         stakingRewards2.notifyRewardAmount( 1 );
         verboseLog( "Staking contract: Alice can't notifyRewardAmount" );
@@ -1677,8 +1676,6 @@ contract CheckStakingPermissions2 is StakingSetup2 {
 
     function testStakingNotifyRewardAmount0() public {
 
-        // vm.warp( STAKING_START_TIME ); // start of staking period
-
         vm.prank(userStakingRewardAdmin);
         // Check emitted event
         vm.expectEmit(true,false,false,false, address(stakingRewards2));
@@ -1686,12 +1683,10 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         stakingRewards2.notifyRewardAmount( 0 );
         verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", 0 );
         verboseLog( "Staking contract: Event RewardAdded emitted" );
-
     }
 
     function testStakingNotifyRewardAmountLimit() public {
 
-        // vm.warp( STAKING_START_TIME ); // start of staking period
         uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION; // computed  reward rate must exceed by at least one unit for raising an error
         vm.prank(userStakingRewardAdmin);
         // Check emitted event
@@ -1700,7 +1695,6 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError -1 );
         verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", rewardAmountToAddForRaisingError );
         verboseLog( "Staking contract: Event RewardAdded emitted" );
-
     }
 
     // function testStakingNotifyRewardAmountMax() public {
