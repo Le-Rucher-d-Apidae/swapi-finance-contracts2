@@ -131,11 +131,10 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     }
 
     function getRewardForDuration() external view returns (uint256) {
-        //  if (isVariableRewardRate) {
-        //     return variableRewardRate.mul(rewardsDuration);
-        // }
         if (isVariableRewardRate) {
-            return variableRewardRate * rewardsDuration;
+            // current reward: constantRewardRatePerTokenStored * _totalSupply * rewardsDuration OR variableRewardRate * rewardsDuration
+            // Current MAX possible reward for duration: constantRewardRatePerTokenStored * variableRewardMaxTotalSupply * rewardsDuration
+            return constantRewardRatePerTokenStored * variableRewardMaxTotalSupply * rewardsDuration;
         }
         return rewardRate * rewardsDuration;
     }
@@ -299,8 +298,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
         uint256 balance = rewardsToken.balanceOf(address(this));
 
-        console.log( "notifyVariableRewardAmount: balance = ", balance );
-
         // emit Uint256ValueEvent(balance, "balance");
 
         // TODO: add and set a max cap when variable reward rate
@@ -316,6 +313,11 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         //     variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored <= balance / rewardsDuration,
         //     "Provided reward too high"
         // );
+
+        console.log( "notifyVariableRewardAmount: balance = ", balance );
+        console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply  = ", variableRewardMaxTotalSupply );
+        console.log( "notifyVariableRewardAmount: _constantRewardRatePerTokenStored = ", _constantRewardRatePerTokenStored );
+        console.log( "notifyVariableRewardAmount: rewardsDuration = ", rewardsDuration );
 
         console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored = ", variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored );
         console.log( "notifyVariableRewardAmount: balance / rewardsDuration = ", balance / rewardsDuration );
