@@ -41,11 +41,17 @@ contract TestLog is Test {
     function debugLog(string memory _msg, uint _val256) public view {
         if (debug) console.log(_msg, _val256);
     }
+    function debugLog(string memory _msg, address _address) public view {
+        if (debug) console.log(_msg, _address);
+    }
     function debugLogTime(string memory _msg) public view {
         if (debug) console.log(_msg, " ts: ", block.timestamp);
     }
     function debugLogTime(string memory _msg, uint _val256) public view {
         if (debug) console.log(_msg, _val256, " ts: ", block.timestamp);
+    }
+    function debugLogTime(string memory _msg, address _address) public view {
+        if (debug) console.log(_msg, _address, " ts: ", block.timestamp);
     }
     function verboseLog(string memory _msg) public view {
         if (verbose) console.log(_msg);
@@ -53,11 +59,17 @@ contract TestLog is Test {
     function verboseLog(string memory _msg, uint _val256) public view {
         if (verbose) console.log(_msg, _val256);
     }
+    function verboseLog(string memory _msg, address _address) public view {
+        if (verbose) console.log(_msg, _address);
+    }
     function verboseLogTime(string memory _msg) public view {
         if (verbose) console.log(_msg, " ts: ", block.timestamp);
     }
     function verboseLogTime(string memory _msg, uint _val256) public view {
         if (verbose) console.log(_msg, _val256, " ts: ", block.timestamp);
+    }
+    function verboseLogTime(string memory _msg, address _address) public view {
+        if (verbose) console.log(_msg, _address, " ts: ", block.timestamp);
     }
 
     // function checkOnlyAddressCanInvoke(address _allowedAddress, address[] memory _users, address _contract, bytes4 _selector) public {
