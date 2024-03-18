@@ -19,6 +19,8 @@ import { console } from "forge-std/src/console.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
 contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, IStakingRewards2Errors {
+
+    uint256 constant ONE_TOKEN = 1e18;
     // using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -106,7 +108,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
             return rewardPerTokenStored;
         }
         return rewardPerTokenStored
-            + ((lastTimeRewardApplicable() - lastUpdateTime) * (rewardRate) * (1e18) / (_totalSupply));
+            + ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * ONE_TOKEN / _totalSupply);
     }
 
     // function earned(address account) public view returns (uint256) {
@@ -124,10 +126,15 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
             //     "rewards[account]"
             // );
 
-            return _balances[account] * ((constantRewardRatePerTokenStored) - userRewardPerTokenPaid[account])
-                + rewards[account];
+            console.log( "earned: account = ", account );
+            console.log( "earned: _balances[account] = ", _balances[account] );
+            console.log( "earned: constantRewardRatePerTokenStored = ", constantRewardRatePerTokenStored );
+            console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
+            console.log( "earned: rewards[account] = ", rewards[account] );
+
+            return _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - lastUpdateTime) / ONE_TOKEN + rewards[account];
         }
-        return _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / 1e18 + rewards[account];
+        return _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN + rewards[account];
     }
 
     function getRewardForDuration() external view returns (uint256) {
