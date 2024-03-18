@@ -182,8 +182,7 @@ contract Erc20Setup1 is UsersSetup1 {
 
     RewardERC20 internal rewardErc20;
     StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2e18;
-
+    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
 
     function setUp() public virtual override {
         // console.log("Erc20Setup1 setUp()");
@@ -202,9 +201,8 @@ contract Erc20Setup2 is UsersSetup2 {
 
     RewardERC20 internal rewardErc20;
     StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2e18;
-    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 1e18;
-
+    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
+    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 1 * ONE_TOKEN;
 
     function setUp() public virtual override {
         // console.log("Erc20Setup2 setUp()");
@@ -224,9 +222,9 @@ contract Erc20Setup3 is UsersSetup3 {
 
     RewardERC20 internal rewardErc20;
     StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 3e18;
-    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 2e18;
-    uint256 constant CHERRY_STAKINGERC20_MINTEDAMOUNT = 1e18;
+    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 3 * ONE_TOKEN;
+    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
+    uint256 constant CHERRY_STAKINGERC20_MINTEDAMOUNT = 1 * ONE_TOKEN;
 
 
     function setUp() public virtual override {
@@ -599,8 +597,8 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-            REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
+            REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
         // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
@@ -707,8 +705,8 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-            REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
+            REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
         // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
@@ -818,8 +816,8 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-            REWARD_INITIAL_AMOUNT * 1e18 / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * 1e18 / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
+            REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
         // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
@@ -959,7 +957,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
 
         uint256 userAliceStakingElapsedTime = block.timestamp - STAKING_START_TIME;
-        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * ONE_TOKEN / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
@@ -1109,7 +1107,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         withdrawStake( userBob, BOB_STAKINGERC20_STAKEDAMOUNT );
 
         uint256 usersStakingElapsedTime = block.timestamp - STAKING_START_TIME;
-        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * ONE_TOKEN / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );
@@ -1268,7 +1266,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         withdrawStake( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT );
 
         uint256 usersStakingElapsedTime = block.timestamp - STAKING_START_TIME;
-        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * 1e18 / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
+        uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * ONE_TOKEN / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         verboseLog( "Staking duration %% : ", STAKING_PERCENTAGE_DURATION );

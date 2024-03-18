@@ -60,3 +60,5 @@ uint256 constant DELTA_0_31 = 31e14;    // % Delta: 0.310000000000000000
 uint256 constant DELTA_0_4  = 4e15;     // % Delta: 0.400000000000000000
 
 
+uint256 constant ONE_TOKEN    = 1e18;
+
