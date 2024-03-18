@@ -725,10 +725,14 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
     //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
     //     );
     // }
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        return CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount * rewardsDuration;
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
+
     function testUsersStakingRewards() public {
         checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0);
         checkRewardForDuration();
@@ -839,9 +843,12 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
     //     );
     // }
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        return CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount * rewardsDuration;
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
 
     function testUsersStakingRewards() public {
@@ -973,11 +980,13 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
     //     );
     // }
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view pure returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        return CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount * rewardsDuration;
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
-
     function withdrawStake(address _user, uint256 _amount) public {
         uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
         // Check emitted event
@@ -1125,9 +1134,13 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
     //     );
     // }
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view pure returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        return CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount * rewardsDuration;
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
 
     function withdrawStake(address _user, uint256 _amount) public {
@@ -1286,9 +1299,13 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
     //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
     //     );
     // }
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view pure returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        return CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount * rewardsDuration;
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
 
     function withdrawStake(address _user, uint256 _amount) public {
@@ -1380,7 +1397,7 @@ contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PE
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
-/*
+// /*
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
 }
 contract DuringStaking2_WithoutWithdral_1 is DuringStaking2_WithoutWithdral(PERCENT_1) {
@@ -1419,7 +1436,7 @@ contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
