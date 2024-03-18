@@ -274,8 +274,8 @@ contract StakingSetup is TestLog {
             assertApproxEqRel( stakingRewardsRewardPerToken, _expectedRewardPerToken, _delta, "Unexpected rewardPerToken() value");
         }
     }
-
 }
+
 contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
