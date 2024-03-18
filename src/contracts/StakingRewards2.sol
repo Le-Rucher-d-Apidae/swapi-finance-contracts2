@@ -126,11 +126,11 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
             //     "rewards[account]"
             // );
 
-            console.log( "earned: account = ", account );
-            console.log( "earned: _balances[account] = ", _balances[account] );
-            console.log( "earned: constantRewardRatePerTokenStored = ", constantRewardRatePerTokenStored );
-            console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
-            console.log( "earned: rewards[account] = ", rewards[account] );
+            // console.log( "earned: account = ", account );
+            // console.log( "earned: _balances[account] = ", _balances[account] );
+            // console.log( "earned: constantRewardRatePerTokenStored = ", constantRewardRatePerTokenStored );
+            // console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
+            // console.log( "earned: rewards[account] = ", rewards[account] );
 
             return _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - lastUpdateTime) / ONE_TOKEN + rewards[account];
         }
@@ -321,13 +321,13 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         //     "Provided reward too high"
         // );
 
-        console.log( "notifyVariableRewardAmount: balance = ", balance );
-        console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply  = ", variableRewardMaxTotalSupply );
-        console.log( "notifyVariableRewardAmount: _constantRewardRatePerTokenStored = ", _constantRewardRatePerTokenStored );
-        console.log( "notifyVariableRewardAmount: rewardsDuration = ", rewardsDuration );
+        // console.log( "notifyVariableRewardAmount: balance = ", balance );
+        // console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply  = ", variableRewardMaxTotalSupply );
+        // console.log( "notifyVariableRewardAmount: _constantRewardRatePerTokenStored = ", _constantRewardRatePerTokenStored );
+        // console.log( "notifyVariableRewardAmount: rewardsDuration = ", rewardsDuration );
 
-        console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored = ", variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored );
-        console.log( "notifyVariableRewardAmount: balance / rewardsDuration = ", balance / rewardsDuration );
+        // console.log( "notifyVariableRewardAmount: variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored = ", variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored );
+        // console.log( "notifyVariableRewardAmount: balance / rewardsDuration = ", balance / rewardsDuration );
 
         if (variableRewardMaxTotalSupply * _constantRewardRatePerTokenStored > balance / rewardsDuration)
             revert ProvidedVariableRewardTooHigh(_constantRewardRatePerTokenStored, _variableRewardMaxTotalSupply, balance);
@@ -368,16 +368,16 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     function notifyRewardAmount(uint256 reward) external onlyOwner updateReward(address(0)) {
         isVariableRewardRate = false;
 
-console.log( "notifyRewardAmount: block.timestamp = ", block.timestamp );
+        // console.log( "notifyRewardAmount: block.timestamp = ", block.timestamp );
         if (block.timestamp >= periodFinish) {
-console.log( "notifyRewardAmount: block.timestamp >= periodFinish");
+            // console.log( "notifyRewardAmount: block.timestamp >= periodFinish");
             rewardRate = reward / rewardsDuration;
         } else {
-console.log( "notifyRewardAmount: block.timestamp < periodFinish");
+            // console.log( "notifyRewardAmount: block.timestamp < periodFinish");
             uint256 remaining = periodFinish - block.timestamp;
-console.log( "notifyRewardAmount: remaining = ", remaining );
+            // console.log( "notifyRewardAmount: remaining = ", remaining );
             uint256 leftover = remaining * rewardRate;
-console.log( "notifyRewardAmount: leftover = ", leftover );
+            // console.log( "notifyRewardAmount: leftover = ", leftover );
             rewardRate = (reward + leftover) / rewardsDuration;
         }
         // Ensure the provided reward amount is not more than the balance in the contract.
@@ -388,10 +388,10 @@ console.log( "notifyRewardAmount: leftover = ", leftover );
         // ProvidedRewardTooHigh
         // require(rewardRate <= balance / rewardsDuration, "Provided reward too high");
 
-console.log( "notifyRewardAmount: reward = ", reward );
-console.log( "notifyRewardAmount: rewardRate = ", rewardRate );
-console.log( "notifyRewardAmount: balance = ", balance );
-console.log( "notifyRewardAmount: rewardsDuration = ", rewardsDuration );
+        // console.log( "notifyRewardAmount: reward = ", reward );
+        // console.log( "notifyRewardAmount: rewardRate = ", rewardRate );
+        // console.log( "notifyRewardAmount: balance = ", balance );
+        // console.log( "notifyRewardAmount: rewardsDuration = ", rewardsDuration );
 
         if (rewardRate > balance / rewardsDuration) revert ProvidedRewardTooHigh(reward, balance, rewardsDuration);
         lastUpdateTime = block.timestamp;
