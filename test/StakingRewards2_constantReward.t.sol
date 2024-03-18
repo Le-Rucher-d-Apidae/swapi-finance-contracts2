@@ -262,7 +262,7 @@ contract StakingSetup is TestLog {
 
     StakingRewards2 internal stakingRewards2;
 
-    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 5;
+    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6;
     uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN; // Max LP : 5
     uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 000 ; for each LP token earn 1 000 reward per second
 
@@ -283,8 +283,8 @@ contract StakingSetup is TestLog {
             assertApproxEqRel( stakingRewardsRewardPerToken, _expectedRewardPerToken, _delta, "Unexpected rewardPerToken() value");
         }
     }
-
 }
+
 contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
@@ -1440,7 +1440,7 @@ contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PE
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
-/*
+// /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
 contract DuringStaking3_WithoutWithdral_1 is DuringStaking3_WithoutWithdral(PERCENT_1) {
@@ -1479,7 +1479,7 @@ contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PE
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
@@ -1639,6 +1639,9 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         debugLog("CheckStakingPermissions2 setUp() end");
     }
 
+
+    // TODO: Check staking MAX amount
+
     function testStakingPause() public {
 
         vm.prank(userAlice);
@@ -1787,7 +1790,7 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         verboseLog( "Staking contract: Events MaxTotalSupply, RewardAddedPerTokenStored emitted" );
     }
 
-    function testStakingnotifyVariableRewardAmountLimit() public {
+    function testStakingnotifyVariableRewardAmountLimit1() public {
 
         vm.prank(userStakingRewardAdmin);
         // Check emitted event
