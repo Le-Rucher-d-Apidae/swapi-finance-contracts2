@@ -1365,7 +1365,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
 // 1 staker deposits right after staking starts and keeps staked amount until the end of staking period
 // TODO: test claim rewards
 // 22 tests
-/*
+// /*
 contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral(0) {
 }
 contract DuringStaking1_WithoutWithdral_1 is DuringStaking1_WithoutWithdral(PERCENT_1) {
@@ -1404,13 +1404,13 @@ contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral(PE
 }
 contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
 // TODO: test claim rewards
 // 22 tests
-/*
+// /*
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
 }
 contract DuringStaking2_WithoutWithdral_1 is DuringStaking2_WithoutWithdral(PERCENT_1) {
@@ -1449,13 +1449,13 @@ contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
 // TODO: test claim rewards
 // 22 tests
-/*
+// /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
 contract DuringStaking3_WithoutWithdral_1 is DuringStaking3_WithoutWithdral(PERCENT_1) {
@@ -1494,13 +1494,13 @@ contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PE
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
-// /*
+/*
 contract DuringStaking1_WithWithdral0 is DuringStaking1_WithWithdral(0) {
 }
 contract DuringStaking1_WithWithdral1 is DuringStaking1_WithWithdral(PERCENT_1) {
@@ -1545,13 +1545,13 @@ contract DuringStaking1_WithWithdral201 is DuringStaking1_WithWithdral(PERCENT_2
 }
 contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(PERCENT_220) {
 }
-// */
+*/
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
-// /*
+/*
 contract DuringStaking2_WithWithdral0 is DuringStaking2_WithWithdral(0) {
 }
 contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) {
@@ -1596,7 +1596,7 @@ contract DuringStaking2_WithWithdral201 is DuringStaking2_WithWithdral(PERCENT_2
 }
 contract DuringStaking2_WithWithdral220 is DuringStaking2_WithWithdral(PERCENT_220) {
 }
-// */
+*/
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
@@ -1654,7 +1654,7 @@ contract DuringStaking3_WithWithdral220 is DuringStaking3_WithWithdral(PERCENT_2
 
 // 8 tests
 
-/*
+// /*
 contract CheckStakingPermissions2 is StakingSetup2 {
 
     function setUp() public virtual override {
@@ -1895,4 +1895,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
     }
 
 }
-*/
+// */
