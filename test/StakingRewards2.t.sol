@@ -969,13 +969,13 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         // Alice withdraws all
         withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
 
-        uint256 userAliceStakingElapsedTime = block.timestamp - STAKING_START_TIME;
+        uint256 usersStakingElapsedTime = block.timestamp - STAKING_START_TIME;
         uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * ONE_TOKEN / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
 
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
         verboseLog( "Staking duration (%%) : ", STAKING_PERCENTAGE_DURATION );
 
-        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, userAliceStakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
+        checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
 
         checkRewardPerToken( expectedRewardPerToken, 0 ); // no delta needed
     }
