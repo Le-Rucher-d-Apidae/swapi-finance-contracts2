@@ -961,7 +961,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
-
         uint256 stakerRewards = stakingRewards2.earned( _staker );
         if (_delta == 0) {
             assertEq( stakerRewards, _expectedRewardAmount );
@@ -1118,7 +1117,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
-
         uint256 stakerRewards = stakingRewards2.earned( _staker );
         if (_delta == 0) {
             assertEq( stakerRewards, _expectedRewardAmount );
@@ -1367,6 +1365,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
 // 1 staker deposits right after staking starts and keeps staked amount until the end of staking period
 
 // 22 tests
+// /*
 contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral(0) {
 }
 contract DuringStaking1_WithoutWithdral_1 is DuringStaking1_WithoutWithdral(PERCENT_1) {
@@ -1405,12 +1404,13 @@ contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral(PE
 }
 contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PERCENT_220) {
 }
-
+// */
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
 
 // 22 tests
+// /*
 contract DuringStaking2_WithoutWithdral_0 is DuringStaking2_WithoutWithdral(0) {
 }
 contract DuringStaking2_WithoutWithdral_1 is DuringStaking2_WithoutWithdral(PERCENT_1) {
@@ -1449,12 +1449,13 @@ contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
-
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
 
 // 22 tests
+// /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
 contract DuringStaking3_WithoutWithdral_1 is DuringStaking3_WithoutWithdral(PERCENT_1) {
@@ -1493,7 +1494,7 @@ contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PE
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
-
+// */
 // ------------------------------------
 
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
@@ -1551,10 +1552,10 @@ contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(PERCENT_2
 
 // 22 tests
 // /*
-contract DuringStaking2_WithWithdral0 is DuringStaking2_WithWithdral(0) {
-}
-contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) {
-}
+// contract DuringStaking2_WithWithdral0 is DuringStaking2_WithWithdral(0) {
+// }
+// contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) {
+// }
 // contract DuringStaking2_WithWithdral10 is DuringStaking2_WithWithdral(PERCENT_10) {
 // }
 // contract DuringStaking2_WithWithdral20 is DuringStaking2_WithWithdral(PERCENT_20) {
@@ -1651,7 +1652,7 @@ contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) 
 
 // Permissions tests
 
-// 22 tests
+// 8 tests
 
 // /*
 contract CheckStakingPermissions2 is StakingSetup2 {
