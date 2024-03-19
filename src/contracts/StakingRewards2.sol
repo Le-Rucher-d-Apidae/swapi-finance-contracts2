@@ -491,17 +491,18 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
 
             lastUpdateTime = lastTimeRewardApplicable();
 
-        }
-        console.log( "updateReward: ! isVariableRewardRate" );
-        rewardPerTokenStored = rewardPerToken();
-        console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
-        lastUpdateTime = lastTimeRewardApplicable();
-        console.log( "updateReward: lastUpdateTime = ", lastUpdateTime );
-        if (account != address(0)) {
-            console.log( "updateReward: earned(account) = ", earned(account) );
-            rewards[account] = earned(account);
-            userRewardPerTokenPaid[account] = rewardPerTokenStored;
+        } else {
+            console.log( "updateReward: ! isVariableRewardRate" );
+            rewardPerTokenStored = rewardPerToken();
             console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
+            lastUpdateTime = lastTimeRewardApplicable();
+            console.log( "updateReward: lastUpdateTime = ", lastUpdateTime );
+            if (account != address(0)) {
+                console.log( "updateReward: earned(account) = ", earned(account) );
+                rewards[account] = earned(account);
+                userRewardPerTokenPaid[account] = rewardPerTokenStored;
+                console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
+            }
         }
         _;
     }
