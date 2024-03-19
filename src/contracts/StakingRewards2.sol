@@ -46,6 +46,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     uint256 public constantRewardRatePerTokenStored;
     uint256 public variableRewardMaxTotalSupply;
     // uint256 public variableRewardRateInitialTotalSupply;
+    // Naïve implementation for rewards computation: lastUpdateTime user map, updated every time a user interacts with the contract
+    mapping(address user => uint256 timeStamp) public userLastUpdateTime;
 
     // Pausable
     uint public lastPauseTime;
@@ -126,28 +128,32 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
             //     "rewards[account]"
             // );
 
-            console.log( "earned: isVariableRewardRate" );
-            console.log( "earned: account = ", account );
-            console.log( "earned: _balances[account] = ", _balances[account] );
-            console.log( "earned: constantRewardRatePerTokenStored = ", constantRewardRatePerTokenStored );
-            console.log( "earned: lastTimeRewardApplicable() = ", lastTimeRewardApplicable() );
-            console.log( "earned: lastUpdateTime = ", lastUpdateTime );
-            // console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
-            console.log( "earned: rewards[account] = ", rewards[account] );
-            console.log( "earned: = ", _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - lastUpdateTime) / ONE_TOKEN + rewards[account] );
+            // console.log( "earned: isVariableRewardRate" );
+            // console.log( "earned: account = ", account );
+            // console.log( "earned: _balances[account] = ", _balances[account] );
+            // console.log( "earned: constantRewardRatePerTokenStored = ", constantRewardRatePerTokenStored );
+            // console.log( "earned: lastTimeRewardApplicable() = ", lastTimeRewardApplicable() );
+            // // console.log( "earned: lastUpdateTime = ", lastUpdateTime );
+            // console.log( "earned: userLastUpdateTime[account] = ", userLastUpdateTime[account] );
 
-            return _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - lastUpdateTime) / ONE_TOKEN + rewards[account];
+            // // console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
+            // console.log( "earned: rewards[account] = ", rewards[account] );
+            // // console.log( "earned: = ", _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - lastUpdateTime) / ONE_TOKEN + rewards[account] );
+            // console.log( "earned: = ", _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - userLastUpdateTime[account]) / ONE_TOKEN + rewards[account] );
+
+            return _balances[account] * constantRewardRatePerTokenStored * (lastTimeRewardApplicable() - userLastUpdateTime[account]) / ONE_TOKEN + rewards[account];
         }
 
-        console.log( "earned: ! isVariableRewardRate" );
-        console.log( "earned: _balances[account] = ", _balances[account] );
-        console.log( "earned: rewardPerToken() = ", rewardPerToken() );
-        console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
-        console.log( "earned: rewards[account] = ", rewards[account] );
-        console.log( "earned: _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN = ", _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN );
-        console.log( "earned: = ", _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN + rewards[account] );
+        uint256 _earned = _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN + rewards[account];
+        // console.log( "earned: ! isVariableRewardRate" );
+        // console.log( "earned: _balances[account] = ", _balances[account] );
+        // console.log( "earned: rewardPerToken() = ", rewardPerToken() );
+        // console.log( "earned: userRewardPerTokenPaid[account] = ", userRewardPerTokenPaid[account] );
+        // console.log( "earned: rewards[account] = ", rewards[account] );
+        // console.log( "earned: _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN = ", _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN );
+        // console.log( "earned: = ", _earned );
 
-        return _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / ONE_TOKEN + rewards[account];
+        return _earned;
     }
 
     function getRewardForDuration() external view returns (uint256) {
@@ -177,13 +183,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
             // Update variable reward rate
             variableRewardRate = constantRewardRatePerTokenStored * _totalSupply;
         }
-
-        // if (isVariableRewardRate) {
-        //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
-        //  constantRewardRatePerTokenStored = constantRewardRatePerTokenStored.add(
-        //       lastTimeRewardApplicable().sub(lastUpdateTime).mul(variableRewardRate).mul(1e18).div(_totalSupply)
-        //   );
-        // }
 
         emit Staked(msg.sender, amount);
     }
@@ -229,20 +228,20 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
-        console.log( "withdraw: amount = ", amount );
+        // console.log( "withdraw: amount = ", amount );
         // require(amount > 0, "Cannot withdraw 0");
         if (amount == 0) revert WithdrawZero();
         if (_balances[msg.sender] == 0) revert NothingToWithdraw();
         if (amount > _balances[msg.sender]) revert NotEnoughToWithdraw(amount, _balances[msg.sender]);
 
-        console.log( "withdraw: after 0 amount check" );
+        // console.log( "withdraw: after 0 amount check" );
         _totalSupply = _totalSupply - amount;
-        console.log( "withdraw: _totalSupply = ", _totalSupply );
-        console.log( "withdraw: current _balances[msg.sender] = ", _balances[msg.sender] );
+        // console.log( "withdraw: _totalSupply = ", _totalSupply );
+        // console.log( "withdraw: current _balances[msg.sender] = ", _balances[msg.sender] );
         _balances[msg.sender] = _balances[msg.sender] - amount;
-        console.log( "withdraw: new _balances[msg.sender] = ", _balances[msg.sender] );
+        // console.log( "withdraw: new _balances[msg.sender] = ", _balances[msg.sender] );
         stakingToken.safeTransfer(msg.sender, amount);
-        console.log( "withdraw: after safeTransfer" );
+        // console.log( "withdraw: after safeTransfer" );
         // if (isVariableRewardRate) {
         //  variableRewardRate = variableRewardRate * _totalSupply / variableRewardRateInitialTotalSupply;
         //  constantRewardRatePerTokenStored = constantRewardRatePerTokenStored.sub(
@@ -250,10 +249,10 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         //   );
         // }
         if (isVariableRewardRate) {
-            console.log( "withdraw: ISVARIABLEREWARDRATE" );
             // Update variable reward rate
             variableRewardRate = constantRewardRatePerTokenStored * _totalSupply;
-            console.log( "withdraw: variableRewardRate = ", variableRewardRate );
+            // console.log( "withdraw: ISVARIABLEREWARDRATE" );
+            // console.log( "withdraw: variableRewardRate = ", variableRewardRate );
         }
         emit Withdrawn(msg.sender, amount);
     }
@@ -375,7 +374,7 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         if (variableRewardMaxTotalSupply * constantRewardRatePerTokenStored > balance / rewardsDuration)
             revert UpdateVariableRewardMaxTotalSupply(variableRewardMaxTotalSupply, balance);
         emit MaxTotalSupply(variableRewardMaxTotalSupply);
-        lastUpdateTime = block.timestamp;
+        lastUpdateTime = block.timestamp; // not useful for rewards computations
     }
 
     function notifyRewardAmount(uint256 reward) external onlyOwner updateReward(address(0)) {
@@ -476,32 +475,33 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     }
 */
     modifier updateReward(address account) {
-        console.log( "updateReward: account = ", account );
+        // console.log( "updateReward: account = ", account );
         if (isVariableRewardRate) {
-            console.log( "updateReward: isVariableRewardRate" );
+            // console.log( "updateReward: isVariableRewardRate" );
             // Update variable reward rate
             rewardPerTokenStored = constantRewardRatePerTokenStored;
 
             if (account != address(0)) {
-                console.log( "updateReward: earned(account) = ", earned(account) );
+                // console.log( "updateReward: earned(account) = ", earned(account) );
                 rewards[account] = earned(account);
                 // userRewardPerTokenPaid[account] = rewardPerTokenStored; // useless
                 // console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
+                userLastUpdateTime[account] = lastTimeRewardApplicable();
             }
 
-            lastUpdateTime = lastTimeRewardApplicable();
+            lastUpdateTime = lastTimeRewardApplicable(); // not useful for rewards computations when variable reward rate
 
         } else {
-            console.log( "updateReward: ! isVariableRewardRate" );
             rewardPerTokenStored = rewardPerToken();
-            console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
             lastUpdateTime = lastTimeRewardApplicable();
-            console.log( "updateReward: lastUpdateTime = ", lastUpdateTime );
+            // console.log( "updateReward: ! isVariableRewardRate" );
+            // console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
+            // console.log( "updateReward: lastUpdateTime = ", lastUpdateTime );
             if (account != address(0)) {
-                console.log( "updateReward: earned(account) = ", earned(account) );
+                // console.log( "updateReward: earned(account) = ", earned(account) );
+                // console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
                 rewards[account] = earned(account);
                 userRewardPerTokenPaid[account] = rewardPerTokenStored;
-                console.log( "updateReward: rewardPerTokenStored = ", rewardPerTokenStored );
             }
         }
         _;
