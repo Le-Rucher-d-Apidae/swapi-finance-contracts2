@@ -590,7 +590,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
@@ -696,7 +696,7 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
@@ -808,7 +808,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
@@ -936,7 +936,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
@@ -1084,7 +1084,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
@@ -1243,7 +1243,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
     }
 
     function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
+        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
         // uint256 stakingTimeReached = getStakingTimeReached();
         uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
         uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
