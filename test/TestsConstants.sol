@@ -7,8 +7,12 @@
 // pragma solidity >= 0.7.6;
 pragma solidity >=0.8.0;
 
+// 0.1 %
+uint256 constant PERCENT_0_1      = 1e15;
 // 1 %
 uint256 constant PERCENT_1      = 1e16;
+// 5 %
+uint256 constant PERCENT_5      = 5e16;
 // 10 %
 uint256 constant PERCENT_10     = 1e17;
 // 20 %
