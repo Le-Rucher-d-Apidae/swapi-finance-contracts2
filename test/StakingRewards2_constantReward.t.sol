@@ -1362,6 +1362,12 @@ contract DuringStaking1_WithoutWithdral_110 is DuringStaking1_WithoutWithdral(PE
 }
 contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral(PERCENT_150) {
 }
+contract DuringStaking1_WithoutWithdral_190 is DuringStaking1_WithoutWithdral(PERCENT_190) {
+}
+contract DuringStaking1_WithoutWithdral_200 is DuringStaking1_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking1_WithoutWithdral_201 is DuringStaking1_WithoutWithdral(PERCENT_201) {
+}
 contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PERCENT_220) {
 }
 // */
@@ -1407,8 +1413,15 @@ contract DuringStaking2_WithoutWithdral_110 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PERCENT_150) {
 }
+contract DuringStaking2_WithoutWithdral_190 is DuringStaking2_WithoutWithdral(PERCENT_190) {
+}
+contract DuringStaking2_WithoutWithdral_200 is DuringStaking2_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking2_WithoutWithdral_201 is DuringStaking2_WithoutWithdral(PERCENT_201) {
+}
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
+
 // */
 // ------------------------------------
 
@@ -1450,7 +1463,13 @@ contract DuringStaking3_WithoutWithdral_101 is DuringStaking3_WithoutWithdral(PE
 }
 contract DuringStaking3_WithoutWithdral_110 is DuringStaking3_WithoutWithdral(PERCENT_110) {
 }
+contract DuringStaking3_WithoutWithdral_190 is DuringStaking3_WithoutWithdral(PERCENT_190) {
+}
 contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PERCENT_150) {
+}
+contract DuringStaking3_WithoutWithdral_200 is DuringStaking3_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking3_WithoutWithdral_201 is DuringStaking3_WithoutWithdral(PERCENT_201) {
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
