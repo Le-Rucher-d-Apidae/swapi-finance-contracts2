@@ -1337,6 +1337,12 @@ contract DuringStaking1_WithoutWithdral_110 is DuringStaking1_WithoutWithdral(PE
 }
 contract DuringStaking1_WithoutWithdral_150 is DuringStaking1_WithoutWithdral(PERCENT_150) {
 }
+contract DuringStaking1_WithoutWithdral_190 is DuringStaking1_WithoutWithdral(PERCENT_190) {
+}
+contract DuringStaking1_WithoutWithdral_200 is DuringStaking1_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking1_WithoutWithdral_201 is DuringStaking1_WithoutWithdral(PERCENT_201) {
+}
 contract DuringStaking1_WithoutWithdral_220 is DuringStaking1_WithoutWithdral(PERCENT_220) {
 }
 // */
@@ -1380,6 +1386,12 @@ contract DuringStaking2_WithoutWithdral_110 is DuringStaking2_WithoutWithdral(PE
 }
 contract DuringStaking2_WithoutWithdral_150 is DuringStaking2_WithoutWithdral(PERCENT_150) {
 }
+contract DuringStaking2_WithoutWithdral_190 is DuringStaking2_WithoutWithdral(PERCENT_190) {
+}
+contract DuringStaking2_WithoutWithdral_200 is DuringStaking2_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking2_WithoutWithdral_201 is DuringStaking2_WithoutWithdral(PERCENT_201) {
+}
 contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PERCENT_220) {
 }
 // */
@@ -1422,6 +1434,12 @@ contract DuringStaking3_WithoutWithdral_101 is DuringStaking3_WithoutWithdral(PE
 contract DuringStaking3_WithoutWithdral_110 is DuringStaking3_WithoutWithdral(PERCENT_110) {
 }
 contract DuringStaking3_WithoutWithdral_150 is DuringStaking3_WithoutWithdral(PERCENT_150) {
+}
+contract DuringStaking3_WithoutWithdral_190 is DuringStaking3_WithoutWithdral(PERCENT_190) {
+}
+contract DuringStaking3_WithoutWithdral_200 is DuringStaking3_WithoutWithdral(PERCENT_200) {
+}
+contract DuringStaking3_WithoutWithdral_201 is DuringStaking3_WithoutWithdral(PERCENT_201) {
 }
 contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PERCENT_220) {
 }
@@ -1698,7 +1716,7 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         verboseLog( "Staking contract: Event RewardAdded emitted" );
     }
 
-    function testStakingNotifyRewardAmountLimit() public {
+    function testStakingNotifyRewardAmountLimit1() public {
 
         uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION; // computed  reward rate must exceed by at least one unit for raising an error
         vm.prank(userStakingRewardAdmin);
@@ -1706,29 +1724,28 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         vm.expectEmit(true,false,false,false, address(stakingRewards2));
         emit StakingRewards2.RewardAdded( rewardAmountToAddForRaisingError -1 );
         stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError -1 );
-        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", rewardAmountToAddForRaisingError );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", rewardAmountToAddForRaisingError - 1 );
         verboseLog( "Staking contract: Event RewardAdded emitted" );
     }
 
-    // function testStakingNotifyRewardAmountMax() public {
+    function testStakingNotifyRewardAmountLimitMax() public {
 
-    //     // Mint reward ERC20 a second time
-    //     vm.prank(erc20Minter);
-    //     rewardErc20.mint( address(stakingRewards2), REWARD_INITIAL_AMOUNT );
+        uint256 additionnalRewardAmount = REWARD_INITIAL_DURATION;
 
-    //     vm.warp( STAKING_START_TIME ); // start of staking period
+        // Mint reward ERC20 a second time
+        vm.prank(erc20Minter);
+        rewardErc20.mint( address(stakingRewards2), additionnalRewardAmount );
+        vm.prank(userStakingRewardAdmin);
+        // Check emitted event
+        vm.expectEmit(true,false,false,false, address(stakingRewards2));
+        emit StakingRewards2.RewardAdded( additionnalRewardAmount );
+        stakingRewards2.notifyRewardAmount( additionnalRewardAmount );
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of an additionnal ", additionnalRewardAmount );
+        verboseLog( "Staking contract: Event RewardAdded emitted" );
+    }
 
-    //     vm.prank(userStakingRewardAdmin);
-    //     // Check emitted event
-    //     vm.expectEmit(true,false,false,false, address(stakingRewards2));
-    //     emit StakingRewards2.RewardAdded( REWARD_INITIAL_AMOUNT );
-    //     stakingRewards2.notifyRewardAmount( REWARD_INITIAL_AMOUNT );
-    //     verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", REWARD_INITIAL_AMOUNT );
-    //     verboseLog( "Staking contract: Event RewardAdded emitted" );
 
-    // }
-
-    function testStakingRewardAmountTooHigh() public {
+    function testStakingRewardAmountTooHigh1() public {
 
         // vm.warp( STAKING_START_TIME ); // start of staking period
         uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION;  // computed  reward rate must exceed by at least one unit for raising an error
@@ -1740,6 +1757,28 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         );
         stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError );
         verboseLog( "Staking contract: Not enough reward balance" );
+    }
+
+    function testStakingRewardAmountTooHigh2() public {
+
+        uint256 rewardAmountToAddForRaisingError = REWARD_INITIAL_DURATION;  // computed  reward rate must exceed by at least one unit for raising an error
+
+        // Mint reward ERC20 a second time
+        vm.prank(erc20Minter);
+        rewardErc20.mint( address(stakingRewards2), rewardAmountToAddForRaisingError );
+
+        // vm.warp( STAKING_START_TIME ); // start of staking period
+
+        vm.prank(userStakingRewardAdmin);
+        // Check revert
+        vm.expectRevert(
+            abi.encodeWithSelector( IStakingRewards2Errors.ProvidedRewardTooHigh.selector, rewardAmountToAddForRaisingError * 2, REWARD_INITIAL_AMOUNT + rewardAmountToAddForRaisingError, REWARD_INITIAL_DURATION )
+        );
+        stakingRewards2.notifyRewardAmount( rewardAmountToAddForRaisingError * 2 );
+
+        verboseLog( "Staking contract: Only owner can notifyRewardAmount of ", rewardAmountToAddForRaisingError + 1 );
+        verboseLog( "Staking contract: Event RewardAdded emitted" );
+
     }
 
     function testStakingSetRewardsDuration() public {
@@ -1795,5 +1834,6 @@ contract CheckStakingPermissions2 is StakingSetup2 {
         verboseLog( "Staking contract: Owner can't setRewardsDuration before previous epoch end" );
         vm.stopPrank();
     }
+
 }
 // */
