@@ -718,13 +718,6 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
-    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-    //     return (rewardsDuration == _rewardTotalDuration ?
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-    //     );
-    // }
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
         verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
@@ -836,13 +829,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
-    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-    //     return (rewardsDuration == _rewardTotalDuration ?
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-    //     );
-    // }
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
         verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
@@ -971,14 +957,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
-    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-
-    //     return (rewardsDuration == _rewardTotalDuration ?
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-    //     );
-    // }
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
         public view /* pure */
         returns (uint256 expectedRewardsAmount) {
@@ -1126,15 +1104,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         verboseLog( _stakerName );
         verboseLog( " rewards: ",  stakerRewards);
     }
-
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
-    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-
-    //     return (rewardsDuration == _rewardTotalDuration ?
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-    //     );
-    // }
 
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
         public view /* pure */
@@ -1295,15 +1264,6 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         verboseLog( _stakerName );
         verboseLog( " rewards: ",  stakerRewards);
     }
-
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
-    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-
-    //     return (rewardsDuration == _rewardTotalDuration ?
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-    //     );
-    // }
 
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
         public view /* pure */
@@ -1500,7 +1460,7 @@ contract DuringStaking3_WithoutWithdral_220 is DuringStaking3_WithoutWithdral(PE
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
-/*
+// /*
 contract DuringStaking1_WithWithdral0 is DuringStaking1_WithWithdral(0) {
 }
 contract DuringStaking1_WithWithdral1 is DuringStaking1_WithWithdral(PERCENT_1) {
@@ -1545,13 +1505,13 @@ contract DuringStaking1_WithWithdral201 is DuringStaking1_WithWithdral(PERCENT_2
 }
 contract DuringStaking1_WithWithdral220 is DuringStaking1_WithWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
-/*
+// /*
 contract DuringStaking2_WithWithdral0 is DuringStaking2_WithWithdral(0) {
 }
 contract DuringStaking2_WithWithdral1 is DuringStaking2_WithWithdral(PERCENT_1) {
@@ -1596,7 +1556,7 @@ contract DuringStaking2_WithWithdral201 is DuringStaking2_WithWithdral(PERCENT_2
 }
 contract DuringStaking2_WithWithdral220 is DuringStaking2_WithWithdral(PERCENT_220) {
 }
-*/
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
