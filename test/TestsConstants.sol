@@ -37,6 +37,8 @@ uint256 constant PERCENT_70     = 7e17;
 uint256 constant PERCENT_80     = 8e17;
 // 90 %
 uint256 constant PERCENT_90     = 9e17;
+// 95 %
+uint256 constant PERCENT_95     = 95e16;
 // 99 %
 uint256 constant PERCENT_99     = 99e16;
 // 100 %
@@ -63,6 +65,7 @@ uint256 constant PERCENT_220    = 22e17;
 uint256 constant DELTA_0        = 0;        // % Delta: 0.000000000000000000
 uint256 constant DELTA_0_015    = 15e14;     // % Delta: 0.015000000000000000
 uint256 constant DELTA_0_04     = 4e14;     // % Delta: 0.040000000000000000
+uint256 constant DELTA_0_08     = 8e14;     // % Delta: 0.080000000000000000
 uint256 constant DELTA_0_31     = 31e14;    // % Delta: 0.310000000000000000
 uint256 constant DELTA_0_4      = 4e15;     // % Delta: 0.400000000000000000
 uint256 constant DELTA_0_5      = 5e15;     // % Delta: 0.500000000000000000
