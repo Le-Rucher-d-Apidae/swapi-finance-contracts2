@@ -262,6 +262,9 @@ contract StakingSetup is TestLog {
     uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
     uint256 immutable STAKING_START_TIME = block.timestamp;
 
+    uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
+    uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+
     StakingRewards2 internal stakingRewards2;
 
     function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
@@ -273,6 +276,29 @@ contract StakingSetup is TestLog {
         } else {
             assertApproxEqRel( stakingRewardsRewardPerToken, _expectedRewardPerToken, _delta, "Unexpected rewardPerToken() value");
         }
+    }
+
+    function getClaimDelta() public view returns (uint256) {
+        uint256 claimDelta = CLAIM_PERCENTAGE_DURATION <= PERCENT_10 ? (CLAIM_PERCENTAGE_DURATION <= PERCENT_1 ? DELTA_5 : DELTA_0_4) : DELTA_0_015;
+        verboseLog( "claimDelta : ", claimDelta );
+        return claimDelta;
+    }
+
+    function getRewardDelta() public view returns (uint256) {
+        uint256 rewardsDelta =
+            CLAIM_PERCENTAGE_DURATION > PERCENT_90 ?
+                (CLAIM_PERCENTAGE_DURATION > PERCENT_95 ?
+                        DELTA_5 : DELTA_0_5)
+                :   STAKING_PERCENTAGE_DURATION <= PERCENT_10 ?
+                            STAKING_PERCENTAGE_DURATION <= PERCENT_5 ?
+                                STAKING_PERCENTAGE_DURATION <= PERCENT_1 ?
+                                    DELTA_0_5 :
+                                    DELTA_5
+                            : DELTA_0_08
+            : DELTA_0_015
+        ;
+        verboseLog( "getRewardDelta : ", rewardsDelta );
+        return rewardsDelta;
     }
 }
 
@@ -519,9 +545,6 @@ contract DepositSetup3 is StakingSetup3 {
 
 contract DuringStaking1_WithoutWithdral is DepositSetup1 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
-    uint256 immutable CLAIM_PERCENTAGE_DURATION;
-
     /**
      * @param _stakingPercentageDuration : 0 - infinite
      * @param _claimPercentageDuration : 0 - 100
@@ -601,29 +624,6 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         );
     }
 
-    function getClaimDelta() public view returns (uint256) {
-        uint256 claimDelta = CLAIM_PERCENTAGE_DURATION <= PERCENT_10 ? (CLAIM_PERCENTAGE_DURATION <= PERCENT_1 ? DELTA_5 : DELTA_0_4) : DELTA_0_015;
-        verboseLog( "claimDelta : ", claimDelta );
-        return claimDelta;
-    }
-
-    function getRewardDelta() public view returns (uint256) {
-        uint256 rewardsDelta =
-            CLAIM_PERCENTAGE_DURATION > PERCENT_90 ?
-                (CLAIM_PERCENTAGE_DURATION > PERCENT_95 ?
-                        DELTA_5 : DELTA_0_5)
-                :   STAKING_PERCENTAGE_DURATION <= PERCENT_10 ?
-                            STAKING_PERCENTAGE_DURATION <= PERCENT_5 ?
-                                STAKING_PERCENTAGE_DURATION <= PERCENT_1 ?
-                                    DELTA_0_5 :
-                                    DELTA_5
-                            : DELTA_0_08
-            : DELTA_0_015
-        ;
-        verboseLog( "getRewardDelta : ", rewardsDelta );
-        return rewardsDelta;
-    }
-
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta) public returns(uint256 claimedRewards_) {
         if (CLAIM_PERCENTAGE_DURATION > 0) {
             verboseLog( "CLAIM:" );
@@ -689,9 +689,6 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
 // ------------------------------------
 
 contract DuringStaking2_WithoutWithdral is DepositSetup2 {
-
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
-    uint256 immutable CLAIM_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration, uint256 _claimPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -778,29 +775,6 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         );
     }
 
-    function getClaimDelta() public view returns (uint256) {
-        uint256 claimDelta = CLAIM_PERCENTAGE_DURATION <= PERCENT_10 ? (CLAIM_PERCENTAGE_DURATION <= PERCENT_1 ? DELTA_5 : DELTA_0_4) : DELTA_0_015;
-        verboseLog( "claimDelta : ", claimDelta );
-        return claimDelta;
-    }
-
-    function getRewardDelta() public view returns (uint256) {
-        uint256 rewardsDelta =
-            CLAIM_PERCENTAGE_DURATION > PERCENT_90 ?
-                (CLAIM_PERCENTAGE_DURATION > PERCENT_95 ?
-                        DELTA_5 : DELTA_0_5)
-                :   STAKING_PERCENTAGE_DURATION <= PERCENT_10 ?
-                            STAKING_PERCENTAGE_DURATION <= PERCENT_5 ?
-                                STAKING_PERCENTAGE_DURATION <= PERCENT_1 ?
-                                    DELTA_0_5 :
-                                    DELTA_5
-                            : DELTA_0_08
-            : DELTA_0_015
-        ;
-        verboseLog( "getRewardDelta : ", rewardsDelta );
-        return rewardsDelta;
-    }
-
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta) public returns(uint256 claimedRewards_) {
         if (CLAIM_PERCENTAGE_DURATION > 0) {
             verboseLog( "CLAIM:" );
@@ -874,9 +848,6 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
 // ------------------------------------
 
 contract DuringStaking3_WithoutWithdral is DepositSetup3 {
-
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
-    uint256 immutable CLAIM_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration, uint256 _claimPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -963,29 +934,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
         );
-    }
-
-    function getClaimDelta() public view returns (uint256) {
-        uint256 claimDelta = CLAIM_PERCENTAGE_DURATION <= PERCENT_10 ? (CLAIM_PERCENTAGE_DURATION <= PERCENT_1 ? DELTA_5 : DELTA_0_4) : DELTA_0_015;
-        verboseLog( "claimDelta : ", claimDelta );
-        return claimDelta;
-    }
-
-    function getRewardDelta() public view returns (uint256) {
-        uint256 rewardsDelta =
-            CLAIM_PERCENTAGE_DURATION > PERCENT_90 ?
-                (CLAIM_PERCENTAGE_DURATION > PERCENT_95 ?
-                        DELTA_5 : DELTA_0_5)
-                :   STAKING_PERCENTAGE_DURATION <= PERCENT_10 ?
-                            STAKING_PERCENTAGE_DURATION <= PERCENT_5 ?
-                                STAKING_PERCENTAGE_DURATION <= PERCENT_1 ?
-                                    DELTA_0_5 :
-                                    DELTA_5
-                            : DELTA_0_08
-            : DELTA_0_015
-        ;
-        verboseLog( "getRewardDelta : ", rewardsDelta );
-        return rewardsDelta;
     }
 
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta) public returns(uint256 claimedRewards_) {
@@ -1083,7 +1031,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
+    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -1228,7 +1176,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
 
 contract DuringStaking2_WithWithdral is DepositSetup2 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
+    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -1382,7 +1330,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
 
 contract DuringStaking3_WithWithdral is DepositSetup3 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
+    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
