@@ -262,6 +262,7 @@ contract StakingSetup is TestLog {
     uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
     uint256 immutable STAKING_START_TIME = block.timestamp;
 
+    uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
     uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
     uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
 
@@ -451,7 +452,7 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
 
 contract DepositSetup1 is StakingSetup1 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
+    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
 
     function setUp() public virtual override {
         // console.log("DepositSetup1 setUp()");
@@ -463,6 +464,7 @@ contract DepositSetup1 is StakingSetup1 {
         emit StakingRewards2.Staked( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( ALICE_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup1 setUp() end");
     }
 
@@ -477,7 +479,7 @@ contract DepositSetup1 is StakingSetup1 {
 
 contract DepositSetup2 is StakingSetup2 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
+    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
 
     function setUp() public virtual override {
         // console.log("DepositSetup2 setUp()");
@@ -494,6 +496,7 @@ contract DepositSetup2 is StakingSetup2 {
         emit StakingRewards2.Staked( userBob, BOB_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( BOB_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup2 setUp() end");
     }
 
@@ -508,8 +511,8 @@ contract DepositSetup2 is StakingSetup2 {
 
 contract DepositSetup3 is StakingSetup3 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
-        + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
+    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
+    //     + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
 
     function setUp() public virtual override {
         // console.log("DepositSetup3 setUp()");
@@ -531,6 +534,8 @@ contract DepositSetup3 is StakingSetup3 {
         emit StakingRewards2.Staked( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( CHERRY_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
+        + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup3 setUp() end");
     }
 
@@ -616,7 +621,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
         return (rewardsDuration == _rewardTotalDuration ?
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
@@ -766,7 +771,7 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
 
         return (rewardsDuration == _rewardTotalDuration ?
@@ -928,7 +933,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
         return (rewardsDuration == _rewardTotalDuration ?
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
@@ -985,7 +990,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         // verboseLog( "STAKING_PERCENTAGE_DURATION <= PERCENT_1 : ", (STAKING_PERCENTAGE_DURATION <= PERCENT_1? 1 : 0) );
         // verboseLog( "STAKING_PERCENTAGE_DURATION <= PERCENT_5 : ", (STAKING_PERCENTAGE_DURATION <= PERCENT_5? 1 : 0) );
         // verboseLog( "rewardsDelta : ", rewardsDelta );
-
 
         if (CLAIM_PERCENTAGE_DURATION > 0) {
             gotoStakingPeriod( CLAIM_PERCENTAGE_DURATION );
@@ -1126,7 +1130,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
 
         return (rewardsDuration == _rewardTotalDuration ?
@@ -1275,7 +1279,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
 
         return (rewardsDuration == _rewardTotalDuration ?
@@ -1433,7 +1437,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public pure returns (uint256 expectedRewardsAmount) {
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
 
         return (rewardsDuration == _rewardTotalDuration ?
