@@ -1170,25 +1170,10 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
             } else {
                 assertApproxEqRel( expectedRewards, claimedRewards_, _delta );
             }
-
             // Claim a second time: should not change the balance
-            // vm.expectEmit(true,true,false,false, address(stakingRewards2));
-            // emit StakingRewards2.RewardPaid( _user, 0 );
-            uint256 logsCount = vm.getRecordedLogs().length;
-    console.log("logsCount = ", logsCount);
             stakingRewards2.getReward();
-            logsCount = vm.getRecordedLogs().length;
-    console.log("logsCount = ", logsCount);
             uint256 rewardErc20UserBalanceAfterClaim2 = rewardErc20.balanceOf( _user );
             assertEq( rewardErc20UserBalanceAfterClaim, rewardErc20UserBalanceAfterClaim2 );
-
-            // if (_delta == 0) {
-            //     assertEq( rewardErc20UserBalanceAfterClaim, rewardErc20UserBalanceAfterClaim2 );
-            // } else {
-            //     assertApproxEqRel( rewardErc20UserBalanceAfterClaim, rewardErc20UserBalanceAfterClaim2, _delta );
-            // }
-
-
             vm.stopPrank();
         }
     }
