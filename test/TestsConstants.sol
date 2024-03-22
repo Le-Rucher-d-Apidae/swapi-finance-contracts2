@@ -17,6 +17,8 @@ uint256 constant PERCENT_1      = 1e16;
 uint256 constant PERCENT_5      = 5e16;
 // 10 %
 uint256 constant PERCENT_10     = 1e17;
+// 15 %
+uint256 constant PERCENT_15     = 15e16;
 // 20 %
 uint256 constant PERCENT_20     = 2e17;
 // 30 %
@@ -25,6 +27,8 @@ uint256 constant PERCENT_30     = 3e17;
 uint256 constant PERCENT_33     = 33e16;
 // 40 %
 uint256 constant PERCENT_40     = 4e17;
+// 45 %
+uint256 constant PERCENT_45     = 45e16;
 // 50 %
 uint256 constant PERCENT_50     = 5e17;
 // 60 %
