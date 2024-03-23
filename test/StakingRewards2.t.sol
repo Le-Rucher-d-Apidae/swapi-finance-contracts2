@@ -1514,7 +1514,7 @@ verboseLog( "getRewardedStakingDuration(DIVIDE) : ", getRewardedStakingDuration(
 
 
 // 1 staker deposits right after staking starts and keeps staked amount until the end of staking period
-/*
+// /*
 contract DuringStaking1_WithoutWithdral_0 is DuringStaking1_WithoutWithdral(PERCENT_0, PERCENT_0) {
 }
 contract DuringStaking1_WithoutWithdral_1_0_1 is DuringStaking1_WithoutWithdral(PERCENT_1, PERCENT_0_1) {
@@ -1599,11 +1599,11 @@ contract DuringStaking1_WithoutWithdral_220__0 is DuringStaking1_WithoutWithdral
 }
 contract DuringStaking1_WithoutWithdral_220__99 is DuringStaking1_WithoutWithdral(PERCENT_220, PERCENT_99) {
 }
-*/
+// */
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and keep staked amount until the end of staking period
-/*
+// /*
 contract DuringStaking2_WithoutWithdral_0__0 is DuringStaking2_WithoutWithdral(PERCENT_0, PERCENT_0) {
 }
 contract DuringStaking2_WithoutWithdral_1__0 is DuringStaking2_WithoutWithdral(PERCENT_1, PERCENT_0) {
@@ -1690,11 +1690,11 @@ contract DuringStaking2_WithoutWithdral_220__0 is DuringStaking2_WithoutWithdral
 }
 contract DuringStaking2_WithoutWithdral_220__99 is DuringStaking2_WithoutWithdral(PERCENT_220, PERCENT_99) {
 }
-*/
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
-/*
+// /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(PERCENT_0, PERCENT_0) {
 }
 contract DuringStaking3_WithoutWithdral_1_0_1 is DuringStaking3_WithoutWithdral(PERCENT_1, PERCENT_0_1) {
@@ -1779,12 +1779,12 @@ contract DuringStaking3_WithoutWithdral_220__0 is DuringStaking3_WithoutWithdral
 }
 contract DuringStaking3_WithoutWithdral_220__99 is DuringStaking3_WithoutWithdral(PERCENT_220, PERCENT_99) {
 }
-*/
+// */
 // ------------------------------------
 
 // 1 staker deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // 42 tests
-/*
+// /*
 contract DuringStaking1_WithWithdral__0 is DuringStaking1_WithWithdral(PERCENT_0, PERCENT_0) {
 }
 contract DuringStaking1_WithWithdral__1_0_1 is DuringStaking1_WithWithdral(PERCENT_1, PERCENT_0_1) {
@@ -1869,11 +1869,11 @@ contract DuringStaking1_WithWithdral__220__0 is DuringStaking1_WithWithdral(PERC
 }
 contract DuringStaking1_WithWithdral__220__99 is DuringStaking1_WithWithdral(PERCENT_220, PERCENT_99) {
 }
-*/
+// */
 // ------------------------------------
 
 // 2 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
-/*
+// /*
 // 42 tests
 contract DuringStaking2_WithWithdral__0 is DuringStaking2_WithWithdral(PERCENT_0, PERCENT_0) {
 }
@@ -1959,101 +1959,101 @@ contract DuringStaking2_WithWithdral__220__0 is DuringStaking2_WithWithdral(PERC
 }
 contract DuringStaking2_WithWithdral__220__99 is DuringStaking2_WithWithdral(PERCENT_220, PERCENT_99) {
 }
-*/
+// */
 // ------------------------------------
 
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // /*
 // 42 tests
-// contract DuringStaking3_WithWithdral__0 is DuringStaking3_WithWithdral(PERCENT_0, PERCENT_0) {
-// }
+contract DuringStaking3_WithWithdral__0 is DuringStaking3_WithWithdral(PERCENT_0, PERCENT_0) {
+}
 contract DuringStaking3_WithWithdral__1_0_1 is DuringStaking3_WithWithdral(PERCENT_1, PERCENT_0_1) {
 }
-// contract DuringStaking3_WithWithdral__10__0 is DuringStaking3_WithWithdral(PERCENT_10, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__10__5 is DuringStaking3_WithWithdral(PERCENT_10, PERCENT_5) {
-// }
-// contract DuringStaking3_WithWithdral__20__0 is DuringStaking3_WithWithdral(PERCENT_20, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__20__10 is DuringStaking3_WithWithdral(PERCENT_20, PERCENT_10) {
-// }
-// contract DuringStaking3_WithWithdral__30__0 is DuringStaking3_WithWithdral(PERCENT_30, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__30__20 is DuringStaking3_WithWithdral(PERCENT_30, PERCENT_15) {
-// }
-// contract DuringStaking3_WithWithdral__33__0 is DuringStaking3_WithWithdral(PERCENT_33, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__33__10 is DuringStaking3_WithWithdral(PERCENT_33, PERCENT_10) {
-// }
-// contract DuringStaking3_WithWithdral__40__0 is DuringStaking3_WithWithdral(PERCENT_40, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__40__5 is DuringStaking3_WithWithdral(PERCENT_40, PERCENT_5) {
-// }
-// contract DuringStaking3_WithWithdral__50__0 is DuringStaking3_WithWithdral(PERCENT_50, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__50__5 is DuringStaking3_WithWithdral(PERCENT_50, PERCENT_5) {
-// }
-// contract DuringStaking3_WithWithdral__60__0 is DuringStaking3_WithWithdral(PERCENT_60, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__60__20 is DuringStaking3_WithWithdral(PERCENT_60, PERCENT_20) {
-// }
-// contract DuringStaking3_WithWithdral__66__0 is DuringStaking3_WithWithdral(PERCENT_66, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__66__30 is DuringStaking3_WithWithdral(PERCENT_66, PERCENT_30) {
-// }
-// contract DuringStaking3_WithWithdral__70__0 is DuringStaking3_WithWithdral(PERCENT_70, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__70__10 is DuringStaking3_WithWithdral(PERCENT_70, PERCENT_10) {
-// }
-// contract DuringStaking3_WithWithdral__80__0 is DuringStaking3_WithWithdral(PERCENT_80, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__80__70 is DuringStaking3_WithWithdral(PERCENT_80, PERCENT_30) {
-// }
-// contract DuringStaking3_WithWithdral__90__0 is DuringStaking3_WithWithdral(PERCENT_90, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__90__50 is DuringStaking3_WithWithdral(PERCENT_90, PERCENT_45) {
-// }
-// contract DuringStaking3_WithWithdral__99__0 is DuringStaking3_WithWithdral(PERCENT_99, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__99__33 is DuringStaking3_WithWithdral(PERCENT_99, PERCENT_33) {
-// }
-// contract DuringStaking3_WithWithdral__100__0 is DuringStaking3_WithWithdral(PERCENT_100, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__100__30 is DuringStaking3_WithWithdral(PERCENT_100, PERCENT_30) {
-// }
-// contract DuringStaking3_WithWithdral__101__0 is DuringStaking3_WithWithdral(PERCENT_101, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__101__50 is DuringStaking3_WithWithdral(PERCENT_101, PERCENT_50) {
-// }
-// contract DuringStaking3_WithWithdral__110__0 is DuringStaking3_WithWithdral(PERCENT_110, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__110__60 is DuringStaking3_WithWithdral(PERCENT_110, PERCENT_40) {
-// }
-// contract DuringStaking3_WithWithdral__150__0 is DuringStaking3_WithWithdral(PERCENT_150, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__150__70 is DuringStaking3_WithWithdral(PERCENT_150, PERCENT_70) {
-// }
-// contract DuringStaking3_WithWithdral__190__0 is DuringStaking3_WithWithdral(PERCENT_190, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__190__80 is DuringStaking3_WithWithdral(PERCENT_190, PERCENT_80) {
-// }
-// contract DuringStaking3_WithWithdral__200__0 is DuringStaking3_WithWithdral(PERCENT_200, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__200__90 is DuringStaking3_WithWithdral(PERCENT_200, PERCENT_90) {
-// }
-// contract DuringStaking3_WithWithdral__201__0 is DuringStaking3_WithWithdral(PERCENT_201, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__201__90 is DuringStaking3_WithWithdral(PERCENT_201, PERCENT_90) {
-// }
-// contract DuringStaking3_WithWithdral__220__0 is DuringStaking3_WithWithdral(PERCENT_220, PERCENT_0) {
-// }
-// contract DuringStaking3_WithWithdral__220__99 is DuringStaking3_WithWithdral(PERCENT_220, PERCENT_99) {
-// }
+contract DuringStaking3_WithWithdral__10__0 is DuringStaking3_WithWithdral(PERCENT_10, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__10__5 is DuringStaking3_WithWithdral(PERCENT_10, PERCENT_5) {
+}
+contract DuringStaking3_WithWithdral__20__0 is DuringStaking3_WithWithdral(PERCENT_20, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__20__10 is DuringStaking3_WithWithdral(PERCENT_20, PERCENT_10) {
+}
+contract DuringStaking3_WithWithdral__30__0 is DuringStaking3_WithWithdral(PERCENT_30, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__30__20 is DuringStaking3_WithWithdral(PERCENT_30, PERCENT_15) {
+}
+contract DuringStaking3_WithWithdral__33__0 is DuringStaking3_WithWithdral(PERCENT_33, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__33__10 is DuringStaking3_WithWithdral(PERCENT_33, PERCENT_10) {
+}
+contract DuringStaking3_WithWithdral__40__0 is DuringStaking3_WithWithdral(PERCENT_40, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__40__5 is DuringStaking3_WithWithdral(PERCENT_40, PERCENT_5) {
+}
+contract DuringStaking3_WithWithdral__50__0 is DuringStaking3_WithWithdral(PERCENT_50, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__50__5 is DuringStaking3_WithWithdral(PERCENT_50, PERCENT_5) {
+}
+contract DuringStaking3_WithWithdral__60__0 is DuringStaking3_WithWithdral(PERCENT_60, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__60__20 is DuringStaking3_WithWithdral(PERCENT_60, PERCENT_20) {
+}
+contract DuringStaking3_WithWithdral__66__0 is DuringStaking3_WithWithdral(PERCENT_66, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__66__30 is DuringStaking3_WithWithdral(PERCENT_66, PERCENT_30) {
+}
+contract DuringStaking3_WithWithdral__70__0 is DuringStaking3_WithWithdral(PERCENT_70, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__70__10 is DuringStaking3_WithWithdral(PERCENT_70, PERCENT_10) {
+}
+contract DuringStaking3_WithWithdral__80__0 is DuringStaking3_WithWithdral(PERCENT_80, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__80__70 is DuringStaking3_WithWithdral(PERCENT_80, PERCENT_30) {
+}
+contract DuringStaking3_WithWithdral__90__0 is DuringStaking3_WithWithdral(PERCENT_90, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__90__50 is DuringStaking3_WithWithdral(PERCENT_90, PERCENT_45) {
+}
+contract DuringStaking3_WithWithdral__99__0 is DuringStaking3_WithWithdral(PERCENT_99, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__99__33 is DuringStaking3_WithWithdral(PERCENT_99, PERCENT_33) {
+}
+contract DuringStaking3_WithWithdral__100__0 is DuringStaking3_WithWithdral(PERCENT_100, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__100__30 is DuringStaking3_WithWithdral(PERCENT_100, PERCENT_30) {
+}
+contract DuringStaking3_WithWithdral__101__0 is DuringStaking3_WithWithdral(PERCENT_101, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__101__50 is DuringStaking3_WithWithdral(PERCENT_101, PERCENT_50) {
+}
+contract DuringStaking3_WithWithdral__110__0 is DuringStaking3_WithWithdral(PERCENT_110, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__110__60 is DuringStaking3_WithWithdral(PERCENT_110, PERCENT_40) {
+}
+contract DuringStaking3_WithWithdral__150__0 is DuringStaking3_WithWithdral(PERCENT_150, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__150__70 is DuringStaking3_WithWithdral(PERCENT_150, PERCENT_70) {
+}
+contract DuringStaking3_WithWithdral__190__0 is DuringStaking3_WithWithdral(PERCENT_190, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__190__80 is DuringStaking3_WithWithdral(PERCENT_190, PERCENT_80) {
+}
+contract DuringStaking3_WithWithdral__200__0 is DuringStaking3_WithWithdral(PERCENT_200, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__200__90 is DuringStaking3_WithWithdral(PERCENT_200, PERCENT_90) {
+}
+contract DuringStaking3_WithWithdral__201__0 is DuringStaking3_WithWithdral(PERCENT_201, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__201__90 is DuringStaking3_WithWithdral(PERCENT_201, PERCENT_90) {
+}
+contract DuringStaking3_WithWithdral__220__0 is DuringStaking3_WithWithdral(PERCENT_220, PERCENT_0) {
+}
+contract DuringStaking3_WithWithdral__220__99 is DuringStaking3_WithWithdral(PERCENT_220, PERCENT_99) {
+}
 
 // */
 // --------------------------------------------------------
 
-/*
+// /*
 
 contract CheckStakingPermissions2 is StakingSetup2 {
 
@@ -2298,4 +2298,4 @@ contract CheckStakingPermissions2 is StakingSetup2 {
 
 }
 
-*/
+// */
