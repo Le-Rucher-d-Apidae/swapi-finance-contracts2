@@ -256,6 +256,11 @@ contract StakingSetup is TestLog {
 
     StakingRewards2 internal stakingRewards2;
 
+    function checkStakingTotalSupplyStaked() public {
+        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
+        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
+        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
+    }
     function getRewardDurationReached() internal view returns (uint256) {
         uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
         // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
@@ -393,6 +398,10 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
         verboseLog( "Staking contract: rewardsDuration ok" );
     }
+
+    function checkAliceStake() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
 }
 
 // ----------------
@@ -440,6 +449,13 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
         assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
 
         verboseLog( "Staking contract: rewardsDuration ok" );
+    }
+
+    function checkAliceStake() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
+    function checkBobStake() public {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
     }
 }
 
@@ -490,6 +506,16 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
 
         verboseLog( "Staking contract: rewardsDuration ok" );
     }
+
+    function checkAliceStake() public {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
+    }
+    function checkBobStake() public {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkCherryStake() public {
+        itStakesCorrectly( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Cherry" );
+    }
 }
 
 
@@ -508,12 +534,6 @@ contract DepositSetup1 is StakingSetup1 {
         vm.stopPrank();
         TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup1 setUp() end");
-    }
-
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
     }
 }
 
@@ -537,12 +557,6 @@ contract DepositSetup2 is StakingSetup2 {
         vm.stopPrank();
         TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup2 setUp() end");
-    }
-
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
     }
 }
 
@@ -573,12 +587,6 @@ contract DepositSetup3 is StakingSetup3 {
         + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup3 setUp() end");
     }
-
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
-    }
 }
 
 // ----------------------------------------------------------------------------
@@ -601,9 +609,6 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         debugLog("DuringStaking1_WithoutWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
     }
@@ -717,12 +722,6 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         debugLog("DuringStaking2_WithoutWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
@@ -851,15 +850,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         debugLog("DuringStaking3_WithoutWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
-    function checkCherryStake() public {
-        itStakesCorrectly(userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
@@ -927,7 +917,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     }
 
     function testUsersStakingRewards() public {
-
         verboseLog( "STAKING_START_TIME = ", STAKING_START_TIME );
         checkUsersStake();
         checkRewardPerToken( 0 , 0, 0 );
@@ -1014,9 +1003,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         debugLog("DuringStaking1_WithWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
     }
@@ -1196,12 +1182,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         debugLog("DuringStaking2_WithWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
@@ -1390,15 +1370,6 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         debugLog("DuringStaking3_WithWithdral setUp() end");
     }
 
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
-    function checkCherryStake() public {
-        itStakesCorrectly( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Cherry" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
@@ -2118,7 +2089,8 @@ contract DuringStaking3_WithWithdral__220__99 is DuringStaking2_WithWithdral(PER
 // */
 // --------------------------------------------------------
 
-/*
+// /*
+
 contract CheckStakingPermissions2 is StakingSetup2 {
 
     function setUp() public virtual override {
@@ -2361,4 +2333,5 @@ contract CheckStakingPermissions2 is StakingSetup2 {
     }
 
 }
-*/
+
+// */
