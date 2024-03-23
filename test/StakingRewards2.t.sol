@@ -27,7 +27,7 @@ import "./TestsConstants.sol";
 contract TestLog is Test {
 
     bool debug = false;
-    bool verbose = true;
+    bool verbose = false;
     Utils internal utils;
 
     function debugLog(string memory _msg) public view {
