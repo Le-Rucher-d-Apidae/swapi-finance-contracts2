@@ -11,8 +11,9 @@
   evm_version = "paris"           # See https://www.evmdiff.com/features?name=PUSH0&kind=opcode
   fuzz = { runs = 1_000 }
   gas_reports = ["*"]
-  optimizer = true
-  optimizer_runs = 10_000
+  optimizer = false
+  #optimizer_runs = 10_000
+  optimizer_runs = 200
   out = "out"
   script = "script"
   #multiple solc versions needed: do not set any specific version
