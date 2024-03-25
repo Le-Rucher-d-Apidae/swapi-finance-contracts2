@@ -4,17 +4,8 @@ pragma solidity >= 0.8.0 < 0.9.0;
 
 import { console } from "forge-std/src/console.sol";
 import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
-import {stdMath} from "forge-std/src/StdMath.sol";
 
 import { Utils } from "./utils/Utils.sol";
-
-
-import { StakingRewards2 } from "../src/contracts/StakingRewards2.sol";
-import { IStakingRewards2Errors } from "../src/contracts/IStakingRewards2Errors.sol";
-
-import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
-import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
-import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 import { IERC20 } from "../src/contracts/Uniswap/v2-core/interfaces/IERC20.sol";
 
