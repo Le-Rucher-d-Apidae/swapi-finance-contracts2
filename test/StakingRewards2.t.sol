@@ -20,11 +20,12 @@ contract StakingSetup is TestLog {
 
     uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
     uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
-    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
     uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
     uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+
+    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     StakingRewards2 internal stakingRewards2;
 
@@ -149,7 +150,11 @@ contract StakingSetup is TestLog {
     }
 
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+        debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
+        debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
+        debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+        debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
         return (rewardsDuration == _rewardTotalDuration ?
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
