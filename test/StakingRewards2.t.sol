@@ -112,14 +112,14 @@ contract StakingSetup is TestLog {
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _percentDelta, uint8 _unitsDelta) internal {
-        debugLog("checkStakingRewards: _stakerName = ", _stakerName);
-        debugLog("checkStakingRewards: _expectedRewardAmount = ", _expectedRewardAmount);
-        debugLog("checkStakingRewards: _percentDelta = ", _percentDelta);
+        debugLog("checkStakingRewards: _stakerName : ", _stakerName);
+        debugLog("checkStakingRewards: _expectedRewardAmount : ", _expectedRewardAmount);
+        debugLog("checkStakingRewards: _percentDelta : ", _percentDelta);
         uint256 stakerRewards = stakingRewards2.earned( _staker );
+        debugLog("checkStakingRewards: stakerRewards = ", stakerRewards);
 
         if (stakerRewards != _expectedRewardAmount) {
             debugLog("stakerRewards != _expectedRewardAmount");
-            debugLog("checkStakingRewards: stakerRewards = ", stakerRewards);
             if (_expectedRewardAmount == 0) {
                 fail("StakingSetup: checkStakingRewards: stakerRewards != _expectedRewardAmount && _expectedRewardAmount == 0");
             }
@@ -155,10 +155,13 @@ contract StakingSetup is TestLog {
         debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
         debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
-        return (rewardsDuration == _rewardTotalDuration ?
+        uint256 expectedStakingRewards_ =
+         (rewardsDuration == _rewardTotalDuration ?
             REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
         );
+        debugLog("expectedStakingRewards: expectedStakingRewards_ = ", expectedStakingRewards_);
+        return expectedStakingRewards_;
     }
 
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta, RewardERC20 rewardErc20) internal returns(uint256 claimedRewards_) {
