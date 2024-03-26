@@ -73,18 +73,6 @@ contract TestLog is Test {
         if (verbose) console.log(_msg, _address, " ts: ", block.timestamp);
     }
 
-    // function checkOnlyAddressCanInvoke(address _allowedAddress, address[] calldata _users, address _contract, bytes4 _selector) public {
-    //     uint256 usersCount = _users.length;
-    //     for (uint256 currentUserIdx = 0; currentUserIdx < usersCount; currentUserIdx++ ) {
-    //         address adr = _users[currentUserIdx];
-    //         if ( adr ==  _allowedAddress) continue;
-    //         vm.prank( adr );
-    //         // _contract.call(_selector)
-    //         (bool staticcallSuccess, ) = _contract.staticcall( abi.encodeWithSelector(_selector) );
-    //         // assert
-    //         assertTrue(staticcallSuccess, "checkOnlyAddressCanInvoke: staticcall failed");
-    //     }
-    // }
 }
 
 // ----------------
@@ -254,6 +242,7 @@ contract Erc20Setup3 is UsersSetup3 {
 // --------------------------------------------------------
 
 abstract contract StakingPreSetup0 is TestLog {
+
     // Rewards constants
 
     // Duration of the rewards program
@@ -274,23 +263,6 @@ abstract contract StakingPreSetup is /* TestLog, */ StakingPreSetup0 {
     uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
     uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
     uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
-
-
-    // Rewards constants
-    // Duration of the rewards program
-    // uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2 h. 46 m. 40 s.
-
-
-
-
-    // // Variable rewards
-    // // Limit max LP tokens staked
-    // uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6; // Max LP : 6
-    // uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN;
-    // uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 ; for each LP token earn 1 000 reward per second
-
-    // uint256 constant internal REWARD_INITIAL_AMOUNT = CONSTANT_REWARDRATE_PERTOKENSTORED * VARIABLE_REWARD_MAXTOTALSUPPLY * REWARD_INITIAL_DURATION;  // Max. budget allocated to rewards
-
 
     function checkStakingTotalSupplyStaked() internal {
         debugLog( "checkStakingTotalSupplyStaked" );
@@ -516,16 +488,4 @@ abstract contract StakingPreSetup is /* TestLog, */ StakingPreSetup0 {
         return rewardedStakingDuration;
     }
 
-//   function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
-//         debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
-//         debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
-//         debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
-//         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-//         verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-//         uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-//         verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-//         return expectedStakingRewardsAmount;
-//     }
-    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
-    // internal view virtual returns (uint256 expectedRewardsAmount);
 }
