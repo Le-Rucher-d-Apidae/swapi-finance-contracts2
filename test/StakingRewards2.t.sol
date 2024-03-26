@@ -16,19 +16,34 @@ import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 // ----------------
 
-abstract contract StakingPrePreSetup is TestLog {
+abstract contract StakingPreSetup0 is TestLog {
+    // Rewards constants
 
+    // Duration of the rewards program
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2 h. 46 m. 40 s.
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
+    internal view virtual returns (uint256 expectedRewardsAmount);
+}
+
+abstract contract StakingPreSetup1 is StakingPreSetup0 {
+
+
+    // Rewards constants
+
+    // Duration of the rewards program
+    // uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2 h. 46 m. 40 s.
 
     // Constant reward amount allocated to the staking program during the reward duration
     // Same reward amount is distributed at each block
     // Stakers will share the reward budget based on their staked amount
     uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
-    internal view virtual returns (uint256 expectedRewardsAmount);
+    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
+    // internal view virtual returns (uint256 expectedRewardsAmount);
 }
 
-abstract contract StakingPreSetup is StakingPrePreSetup {
+abstract contract StakingPreSetup is StakingPreSetup1 {
 
     StakingRewards2 internal stakingRewards2;
     uint256 immutable STAKING_START_TIME = block.timestamp;
@@ -39,7 +54,7 @@ abstract contract StakingPreSetup is StakingPrePreSetup {
 
     // Rewards constants
     // Duration of the rewards program
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
+    // uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2 h. 46 m. 40 s.
 
 
 
