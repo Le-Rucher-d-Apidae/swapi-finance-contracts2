@@ -3,6 +3,9 @@ require('@nomiclabs/hardhat-ethers')
 require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-foundry");
 
+require("@nomicfoundation/hardhat-chai-matchers")
+require("@nomiclabs/hardhat-truffle5");
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task('accounts', 'Prints the list of accounts', async () => {

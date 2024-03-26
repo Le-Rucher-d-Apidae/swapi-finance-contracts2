@@ -152,3 +152,30 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
         transferToken(from, to, transferAmount);
     }
 }
+
+contract WhenMintingTokens is BaseSetup {
+
+    function setUp() public virtual override {
+        BaseSetup.setUp();
+        console.log("WhenMintingTokens tokens");
+    }
+
+    function mintTo(address to, uint256 mintAmount) public {
+        vm.prank(to);
+        this.mint(to, mintAmount);
+    }
+
+    function testAnyoneCanMint() public {
+        mintTo(alice, 1e18);
+        mintTo(bob, 2e18);
+
+        assertEq( balanceOf(alice), 1e18 );
+        assertEq( balanceOf(bob), 2e18 );
+    }
+
+    // function testMintWithFuzzing(address to, uint256 mintAmount) public {
+    //     vm.assume(mintAmount != 0);
+    //     testMint(to, mintAmount % maxTransferAmount);
+    // }
+
+}
