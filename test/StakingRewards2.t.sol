@@ -15,7 +15,7 @@ import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 // ----------------
-
+/*
 abstract contract StakingPreSetup0 is TestLog {
     // Rewards constants
 
@@ -25,8 +25,8 @@ abstract contract StakingPreSetup0 is TestLog {
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
     internal view virtual returns (uint256 expectedRewardsAmount);
 }
-
-abstract contract StakingPreSetup1 is StakingPreSetup0 {
+*/
+abstract contract /* StakingPreSetup1 */ StakingPreSetupCRR is /* StakingPreSetup0 */ StakingPreSetup {
 
 
     // Rewards constants
@@ -37,20 +37,28 @@ abstract contract StakingPreSetup1 is StakingPreSetup0 {
     // Constant reward amount allocated to the staking program during the reward duration
     // Same reward amount is distributed at each block
     // Stakers will share the reward budget based on their staked amount
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+    // uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
 
     // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
     // internal view virtual returns (uint256 expectedRewardsAmount);
-}
 
+    function setUp() public virtual /* override */ {
+        debugLog("StakingPreSetupCRR setUp() start");
+        REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+        verboseLog("StakingPreSetupCRR setUp()");
+            debugLog("StakingPreSetupCRR setUp() end");
+    }
+
+}
+/*
 abstract contract StakingPreSetup is StakingPreSetup1 {
 
     StakingRewards2 internal stakingRewards2;
     uint256 immutable STAKING_START_TIME = block.timestamp;
 
-    uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
-    uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
-    uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+    uint256 internal TOTAL_STAKED_AMOUNT;
+    uint256 STAKING_PERCENTAGE_DURATION;
+    uint256 CLAIM_PERCENTAGE_DURATION;
 
     // Rewards constants
     // Duration of the rewards program
@@ -76,7 +84,7 @@ abstract contract StakingPreSetup is StakingPreSetup1 {
         verboseLog( "getRewardDurationReached: rewardDurationReached = ",  rewardDurationReached);
         return rewardDurationReached;
     }
-    function getRewardDurationReached(uint _durationReached) internal view /* pure */ returns (uint256) {
+    function getRewardDurationReached(uint _durationReached) internal view returns (uint256) {
         debugLog( "getRewardDurationReached: ",  _durationReached);
         uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
         debugLog( "getRewardDurationReached: rewardDurationReached = ",  rewardDurationReached);
@@ -305,15 +313,15 @@ abstract contract StakingPreSetup is StakingPreSetup1 {
     // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
     // internal view virtual returns (uint256 expectedRewardsAmount);
 }
-
-contract StakingSetup is StakingPreSetup {
+*/
+contract StakingSetup is /* StakingPreSetup */ StakingPreSetupCRR {
 
     // StakingRewards2 internal stakingRewards2;
     // uint256 immutable STAKING_START_TIME = block.timestamp;
 
-    // uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
-    // uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
-    // uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+    // uint256 internal TOTAL_STAKED_AMOUNT;
+    // uint256 STAKING_PERCENTAGE_DURATION;
+    // uint256 CLAIM_PERCENTAGE_DURATION;
 
     // // Rewards constants
     // // Duration of the rewards program
@@ -323,6 +331,14 @@ contract StakingSetup is StakingPreSetup {
     // Reward rate is fixed/constant troughout the reward duration
     // Stakers will share the reward budget based on their staked amount
     // uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+
+
+    function setUp() public virtual override {
+        debugLog("StakingSetup setUp() start");
+        StakingPreSetupCRR.setUp();
+        verboseLog("StakingSetup setUp()");
+            debugLog("StakingSetup setUp() end");
+    }
 
     function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
     // internal view returns (uint256 expectedRewardsAmount) {
@@ -348,9 +364,10 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
+    function setUp() public virtual override(Erc20Setup1, StakingSetup) {
         debugLog("StakingSetup1 setUp() start");
         Erc20Setup1.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
@@ -382,9 +399,10 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
+    function setUp() public virtual override(Erc20Setup2, StakingSetup) {
         debugLog("StakingSetup2 setUp() start");
         Erc20Setup2.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
@@ -422,9 +440,10 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant CHERRY_STAKINGERC20_STAKEDAMOUNT = CHERRY_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
+    function setUp() public virtual override(Erc20Setup3, StakingSetup) {
         debugLog("StakingSetup3 setUp() start");
         Erc20Setup3.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
