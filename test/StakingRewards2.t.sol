@@ -16,7 +16,19 @@ import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 // ----------------
 
-contract StakingSetup is TestLog {
+abstract contract StakingPrePreSetup is TestLog {
+
+
+    // Constant reward amount allocated to the staking program during the reward duration
+    // Same reward amount is distributed at each block
+    // Stakers will share the reward budget based on their staked amount
+    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
+    internal view virtual returns (uint256 expectedRewardsAmount);
+}
+
+abstract contract StakingPreSetup is StakingPrePreSetup {
 
     StakingRewards2 internal stakingRewards2;
     uint256 immutable STAKING_START_TIME = block.timestamp;
@@ -29,10 +41,13 @@ contract StakingSetup is TestLog {
     // Duration of the rewards program
     uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
 
-    // Classic reward allocation is a fixed budget ammoutn allocated to the staking program during the reward duration
-    // Reward rate is fixed/constant troughout the reward duration
-    // Stakers will share the reward budget based on their staked amount
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+
+
+
+    // // Constant reward amount allocated to the staking program during the reward duration
+    // // Same reward amount is distributed at each block
+    // // Stakers will share the reward budget based on their staked amount
+    // uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
 
     function checkStakingTotalSupplyStaked() internal {
         debugLog( "checkStakingTotalSupplyStaked" );
@@ -258,7 +273,46 @@ contract StakingSetup is TestLog {
         return rewardedStakingDuration;
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+    //     debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
+    //     debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
+    //     debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
+    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+    //     debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
+    //     uint256 expectedStakingRewards_ =
+    //      (rewardsDuration == _rewardTotalDuration ?
+    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
+    //     );
+    //     debugLog("expectedStakingRewards: expectedStakingRewards_ = ", expectedStakingRewards_);
+    //     return expectedStakingRewards_;
+    // }
+    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
+    // internal view virtual returns (uint256 expectedRewardsAmount);
+}
+
+contract StakingSetup is StakingPreSetup {
+
+    // StakingRewards2 internal stakingRewards2;
+    // uint256 immutable STAKING_START_TIME = block.timestamp;
+
+    // uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
+    // uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
+    // uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+
+    // // Rewards constants
+    // // Duration of the rewards program
+    // uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
+
+    // Classic reward allocation is a fixed budget ammoutn allocated to the staking program during the reward duration
+    // Reward rate is fixed/constant troughout the reward duration
+    // Stakers will share the reward budget based on their staked amount
+    // uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration)
+    // internal view returns (uint256 expectedRewardsAmount) {
+    internal view virtual override returns (uint256 expectedRewardsAmount) {
+
         debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
         debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
         debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
