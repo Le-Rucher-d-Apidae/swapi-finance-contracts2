@@ -400,6 +400,7 @@ contract DepositSetup1 is StakingSetup1 {
     function setUp() public virtual override {
         // console.log("DepositSetup1 setUp()");
         debugLog("DepositSetup1 setUp() start");
+        verboseLog("DepositSetup1 setUp()");
         StakingSetup1.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -417,11 +418,10 @@ contract DepositSetup1 is StakingSetup1 {
 
 contract DepositSetup2 is StakingSetup2 {
 
-    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
-
     function setUp() public virtual override {
         // console.log("DepositSetup2 setUp()");
         debugLog("DepositSetup2 setUp() start");
+        verboseLog("DepositSetup2 setUp()");
         StakingSetup2.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -444,12 +444,10 @@ contract DepositSetup2 is StakingSetup2 {
 
 contract DepositSetup3 is StakingSetup3 {
 
-    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
-    //     + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
-
     function setUp() public virtual override {
         // console.log("DepositSetup3 setUp()");
         debugLog("DepositSetup3 setUp() start");
+        verboseLog("DepositSetup3 setUp()");
         StakingSetup3.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -477,8 +475,6 @@ contract DepositSetup3 is StakingSetup3 {
 // ----------------------------------------------------------------------------
 
 contract DuringStaking1_WithoutWithdral is DepositSetup1 {
-
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -528,8 +524,6 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
 // ------------------------------------
 
 contract DuringStaking2_WithoutWithdral is DepositSetup2 {
-
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -583,8 +577,6 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
 // ------------------------------------
 
 contract DuringStaking3_WithoutWithdral is DepositSetup3 {
-
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -646,7 +638,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -709,7 +700,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
 
 contract DuringStaking2_WithWithdral is DepositSetup2 {
 
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -782,7 +772,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
 
 contract DuringStaking3_WithWithdral is DepositSetup3 {
 
-    // uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
