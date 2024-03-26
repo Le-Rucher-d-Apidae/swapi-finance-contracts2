@@ -19,21 +19,23 @@ import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 contract StakingSetup is TestLog {
 
     StakingRewards2 internal stakingRewards2;
-
-    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6;
-    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN; // Max LP : 5
-    uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 000 ; for each LP token earn 1 000 reward per second
-
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
-
-    uint256 constant internal REWARD_INITIAL_AMOUNT = CONSTANT_REWARDRATE_PERTOKENSTORED * VARIABLE_REWARD_MAXTOTALSUPPLY * REWARD_INITIAL_DURATION;
-    // console.log("StakingSetup: REWARD_INITIAL_AMOUNT = ", REWARD_INITIAL_AMOUNT);
-
     uint256 immutable STAKING_START_TIME = block.timestamp;
 
     uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
     uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
     uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
+
+    // Rewards constants
+    // Duration of the rewards program
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
+
+    // Variable rewards
+    // Limit max LP tokens staked
+    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6; // Max LP : 6
+    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN;
+    uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 ; for each LP token earn 1 000 reward per second
+
+    uint256 constant internal REWARD_INITIAL_AMOUNT = CONSTANT_REWARDRATE_PERTOKENSTORED * VARIABLE_REWARD_MAXTOTALSUPPLY * REWARD_INITIAL_DURATION;  // Max. budget allocated to rewards
 
     function checkStakingTotalSupplyStaked() internal {
         debugLog( "checkStakingTotalSupplyStaked" );
