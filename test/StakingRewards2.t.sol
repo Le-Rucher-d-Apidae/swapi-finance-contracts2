@@ -18,16 +18,21 @@ import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 contract StakingSetup is TestLog {
 
-    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
+    StakingRewards2 internal stakingRewards2;
+    uint256 immutable STAKING_START_TIME = block.timestamp;
 
     uint256 /* constant */ internal TOTAL_STAKED_AMOUNT;
     uint256 /* immutable */ STAKING_PERCENTAGE_DURATION;
     uint256 /* immutable */ CLAIM_PERCENTAGE_DURATION;
 
-    uint256 immutable STAKING_START_TIME = block.timestamp;
+    // Rewards constants
+    // Duration of the rewards program
+    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
 
-    StakingRewards2 internal stakingRewards2;
+    // Classic reward allocation is a fixed budget ammoutn allocated to the staking program during the reward duration
+    // Reward rate is fixed/constant troughout the reward duration
+    // Stakers will share the reward budget based on their staked amount
+    uint256 constant internal REWARD_INITIAL_AMOUNT = 100_000; // 10e5
 
     function checkStakingTotalSupplyStaked() internal {
         debugLog( "checkStakingTotalSupplyStaked" );
