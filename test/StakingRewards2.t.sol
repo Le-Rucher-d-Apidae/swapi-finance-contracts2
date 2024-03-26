@@ -150,21 +150,6 @@ contract StakingSetup is TestLog {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
-        debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
-        debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
-        debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
-        uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-        debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
-        uint256 expectedStakingRewards_ =
-         (rewardsDuration == _rewardTotalDuration ?
-            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-        );
-        debugLog("expectedStakingRewards: expectedStakingRewards_ = ", expectedStakingRewards_);
-        return expectedStakingRewards_;
-    }
-
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta, RewardERC20 rewardErc20) internal returns(uint256 claimedRewards_) {
         if (CLAIM_PERCENTAGE_DURATION > 0) {
             verboseLog( "CLAIM:" );
@@ -266,6 +251,21 @@ contract StakingSetup is TestLog {
         uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
         verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
         return rewardedStakingDuration;
+    }
+
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+        debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
+        debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
+        debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
+        uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+        debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
+        uint256 expectedStakingRewards_ =
+         (rewardsDuration == _rewardTotalDuration ?
+            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
+        );
+        debugLog("expectedStakingRewards: expectedStakingRewards_ = ", expectedStakingRewards_);
+        return expectedStakingRewards_;
     }
 
 }
