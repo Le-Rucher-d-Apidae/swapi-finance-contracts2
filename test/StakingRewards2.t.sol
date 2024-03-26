@@ -89,6 +89,7 @@ contract StakingSetup is TestLog {
     }
 
     function getRewardPercentDelta() public view returns (uint256) {
+        verboseLog("getRewardPercentDelta");
         // Longer staking period = better accuracy : less delta
         uint256 rewardsPercentDelta =
             CLAIM_PERCENTAGE_DURATION > PERCENT_90 ?
@@ -102,7 +103,7 @@ contract StakingSetup is TestLog {
                             : DELTA_0_08
             : DELTA_0_015
         ;
-        verboseLog( "getRewardDelta : ", rewardsPercentDelta );
+        verboseLog( "getRewardDelta = ", rewardsPercentDelta );
         return rewardsPercentDelta;
     }
 
