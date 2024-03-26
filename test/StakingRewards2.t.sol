@@ -567,6 +567,7 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
     function setUp() public override {
         debugLog("DuringStaking1_WithoutWithdral setUp() start");
         DepositSetup1.setUp();
+        verboseLog("DuringStaking1_WithoutWithdral");
         debugLog("DuringStaking1_WithoutWithdral setUp() end");
     }
 
@@ -623,6 +624,7 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
     function setUp() public override {
         debugLog("DuringStaking2_WithoutWithdral setUp() start");
         DepositSetup2.setUp();
+        verboseLog("DuringStaking2_WithoutWithdral");
         debugLog("DuringStaking2_WithoutWithdral setUp() end");
     }
 
@@ -688,7 +690,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     function setUp() public override {
         debugLog("DuringStaking3_WithoutWithdral setUp() start");
         DepositSetup3.setUp();
-        verboseLog("DuringStaking3_WithoutWithdral setUp()");
+        verboseLog("DuringStaking3_WithoutWithdral");
         debugLog("DuringStaking3_WithoutWithdral setUp() end");
     }
 
