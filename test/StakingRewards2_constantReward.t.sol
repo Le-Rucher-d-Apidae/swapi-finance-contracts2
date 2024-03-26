@@ -1,298 +1,72 @@
 // SPDX-License-Identifier: UNLICENSED
-// pragma solidity >= 0.8.20 < 0.9.0;
-// pragma solidity ^0.8.23;
-// pragma solidity >= 0.8.20;
-// pragma solidity ^0.7.6;
-// pragma solidity >= 0.7.6 <= 0.8.0;
-// pragma solidity >= 0.7.6;
-pragma solidity >=0.8.0;
-// pragma solidity <=0.8.0;
+// pragma solidity >=0.8.0;
+pragma solidity >= 0.8.0 < 0.9.0;
 
 import { console } from "forge-std/src/console.sol";
-import { stdStorage, StdStorage, Test } from "forge-std/src/Test.sol";
+import {stdMath} from "forge-std/src/StdMath.sol";
 
-import { Utils } from "./utils/Utils.sol";
+import "./StakingRewards2_base.t.sol";
 
-
-import { StakingRewards2 } from "../src/contracts/StakingRewards2.sol";
 import { IStakingRewards2Errors } from "../src/contracts/IStakingRewards2Errors.sol";
 
 import { Math } from "@openzeppelin/contracts@5.0.2/utils/math/Math.sol";
 import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
-import { IERC20 } from "../src/contracts/Uniswap/v2-core/interfaces/IERC20.sol";
-
-import { RewardERC20 } from "./contracts/RewardERC20.sol";
-import { StakingERC20 } from "./contracts/StakingERC20.sol";
-
-import "./TestsConstants.sol";
-
-// TODO : move to utils
-contract TestLog is Test {
-
-    bool debug = false;
-    bool verbose = true;
-    Utils internal utils;
-
-    function debugLog(string memory _msg) public view {
-        if (debug) console.log(_msg);
-    }
-    function debugLog(string memory _msg, uint _val256) public view {
-        if (debug) console.log(_msg, _val256);
-    }
-    function debugLog(string memory _msg, address _address) public view {
-        if (debug) console.log(_msg, _address);
-    }
-    function debugLogTime(string memory _msg) public view {
-        if (debug) console.log(_msg, " ts: ", block.timestamp);
-    }
-    function debugLogTime(string memory _msg, uint _val256) public view {
-        if (debug) console.log(_msg, _val256, " ts: ", block.timestamp);
-    }
-    function debugLogTime(string memory _msg, address _address) public view {
-        if (debug) console.log(_msg, _address, " ts: ", block.timestamp);
-    }
-    function verboseLog(string memory _msg) public view {
-        if (verbose) console.log(_msg);
-    }
-    function verboseLog(string memory _msg, uint _val256) public view {
-        if (verbose) console.log(_msg, _val256);
-    }
-    function verboseLog(string memory _msg, address _address) public view {
-        if (verbose) console.log(_msg, _address);
-    }
-    function verboseLogTime(string memory _msg) public view {
-        if (verbose) console.log(_msg, " ts: ", block.timestamp);
-    }
-    function verboseLogTime(string memory _msg, uint _val256) public view {
-        if (verbose) console.log(_msg, _val256, " ts: ", block.timestamp);
-    }
-    function verboseLogTime(string memory _msg, address _address) public view {
-        if (verbose) console.log(_msg, _address, " ts: ", block.timestamp);
-    }
-
-    // function checkOnlyAddressCanInvoke(address _allowedAddress, address[] memory _users, address _contract, bytes4 _selector) public {
-    function checkOnlyAddressCanInvoke(address _allowedAddress, address[] calldata _users, address _contract, bytes4 _selector) public {
-        uint256 usersCount = _users.length;
-        for (uint256 currentUserIdx = 0; currentUserIdx < usersCount; currentUserIdx++ ) {
-            address adr = _users[currentUserIdx];
-            if ( adr ==  _allowedAddress) continue;
-            vm.prank( adr );
-            // _contract.call(_selector)
-            (bool staticcallSuccess, ) = _contract.staticcall( abi.encodeWithSelector(_selector) );
-            // assert
-            assertTrue(staticcallSuccess, "checkOnlyAddressCanInvoke: staticcall failed");
-        }
-    }
-}
-
 // ----------------
 
-contract UsersSetup1 is TestLog {
-    address payable[] internal users;
+abstract contract StakingPreSetupVRR is StakingPreSetup {
 
-    address internal erc20Admin;
-    address internal erc20Minter;
-    address internal userStakingRewardAdmin;
+    // // Rewards constants
 
-    address internal userAlice;
+    // Variable rewards
+    // Limit max LP tokens staked
+    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6; // Max LP : 6
+    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN;
+    uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 ; for each LP token earn 1 000 reward per second
 
-    function setUp() public virtual {
-
-        // console.log("UsersSetup1 setUp()");
-        debugLog("UsersSetup1 setUp() start");
-        utils = new Utils();
-        users = utils.createUsers(5);
-
-        erc20Admin = users[0];
-        vm.label(erc20Admin, "ERC20Admin");
-        erc20Minter = users[1];
-        vm.label(erc20Minter, "ERC20Minter");
-        userStakingRewardAdmin = users[2];
-        vm.label(userStakingRewardAdmin, "StakingRewardAdmin");
-
-        userAlice = users[3];
-        vm.label(userAlice, "Alice");
-        debugLog("UsersSetup1 setUp() end");
+    function setUp() public virtual /* override */ {
+        debugLog("StakingPreSetupCRR setUp() start");
+        REWARD_INITIAL_AMOUNT =
+            CONSTANT_REWARDRATE_PERTOKENSTORED * VARIABLE_REWARD_MAXTOTALSUPPLY * REWARD_INITIAL_DURATION;  // Max. budget allocated to rewards
+        verboseLog("StakingPreSetupCRR setUp()");
+            debugLog("StakingPreSetupCRR setUp() end");
     }
+
 }
 
-contract UsersSetup2 is TestLog {
-    address payable[] internal users;
-
-    address internal erc20Admin;
-    address internal erc20Minter;
-    address internal userStakingRewardAdmin;
-
-    address internal userAlice;
-    address internal userBob;
-
-    function setUp() public virtual {
-
-        // console.log("UsersSetup2 setUp()");
-        debugLog("UsersSetup2 setUp() start");
-        utils = new Utils();
-        users = utils.createUsers(5);
-
-        erc20Admin = users[0];
-        vm.label(erc20Admin, "ERC20Admin");
-        erc20Minter = users[1];
-        vm.label(erc20Minter, "ERC20Minter");
-        userStakingRewardAdmin = users[2];
-        vm.label(userStakingRewardAdmin, "StakingRewardAdmin");
-
-        userAlice = users[3];
-        vm.label(userAlice, "Alice");
-        userBob = users[4];
-        vm.label(userBob, "Bob");
-        debugLog("UsersSetup2 setUp() end");
-    }
-}
-
-// ----------------
-
-contract UsersSetup3 is TestLog {
-    address payable[] internal users;
-
-    address internal erc20Admin;
-    address internal erc20Minter;
-    address internal userStakingRewardAdmin;
-
-    address internal userAlice;
-    address internal userBob;
-    address internal userCherry;
-
-    function setUp() public virtual {
-
-        // console.log("UsersSetup3 setUp()");
-        debugLog("UsersSetup3 setUp() start");
-        utils = new Utils();
-        users = utils.createUsers(6);
-
-        erc20Admin = users[0];
-        vm.label(erc20Admin, "ERC20Admin");
-        erc20Minter = users[1];
-        vm.label(erc20Minter, "ERC20Minter");
-        userStakingRewardAdmin = users[2];
-        vm.label(userStakingRewardAdmin, "StakingRewardAdmin");
-
-        userAlice = users[3];
-        vm.label(userAlice, "Alice");
-        userBob = users[4];
-        vm.label(userBob, "Bob");
-        userCherry = users[5];
-        vm.label(userCherry, "Cherry");
-
-        debugLog("UsersSetup3 setUp() end");
-    }
-}
-
-// ------------------------------------
-
-contract Erc20Setup1 is UsersSetup1 {
-
-    RewardERC20 internal rewardErc20;
-    StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
-
+contract StakingSetup is StakingPreSetupVRR {
 
     function setUp() public virtual override {
-        // console.log("Erc20Setup1 setUp()");
-        debugLog("Erc20Setup1 setUp() start");
-        UsersSetup1.setUp();
-        vm.startPrank(erc20Minter);
-        rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
-        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
-        stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
-        vm.stopPrank();
-        debugLog("Erc20Setup1 setUp() end");
+        debugLog("StakingSetup setUp() start");
+        StakingPreSetupVRR.setUp();
+        verboseLog("StakingSetup setUp()");
+        debugLog("StakingSetup setUp() end");
     }
-}
 
-contract Erc20Setup2 is UsersSetup2 {
-
-    RewardERC20 internal rewardErc20;
-    StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
-    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 1 * ONE_TOKEN;
-
-
-    function setUp() public virtual override {
-        // console.log("Erc20Setup2 setUp()");
-        debugLog("Erc20Setup2 setUp() start");
-        UsersSetup2.setUp();
-        vm.startPrank(erc20Minter);
-        rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
-        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
-        stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
-        stakingERC20.mint(userBob, BOB_STAKINGERC20_MINTEDAMOUNT);
-        vm.stopPrank();
-        debugLog("Erc20Setup2 setUp() end");
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached , uint256 _rewardTotalDuration)
+    internal view virtual override returns (uint256 expectedRewardsAmount) {
+        debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
+        debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
+        debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
+        uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
-}
 
-contract Erc20Setup3 is UsersSetup3 {
-
-    RewardERC20 internal rewardErc20;
-    StakingERC20 internal stakingERC20;
-    uint256 constant ALICE_STAKINGERC20_MINTEDAMOUNT = 3 * ONE_TOKEN;
-    uint256 constant BOB_STAKINGERC20_MINTEDAMOUNT = 2 * ONE_TOKEN;
-    uint256 constant CHERRY_STAKINGERC20_MINTEDAMOUNT = 1 * ONE_TOKEN;
-
-
-    function setUp() public virtual override {
-        // console.log("Erc20Setup3 setUp()");
-        debugLog("Erc20Setup3 setUp() start");
-        UsersSetup3.setUp();
-        vm.startPrank(erc20Minter);
-        rewardErc20 = new RewardERC20(erc20Admin, erc20Minter, "TestReward", "TSTRWD");
-        stakingERC20 = new StakingERC20(erc20Admin, erc20Minter, "Uniswap V2 Staking", "UNI-V2 Staking");
-        stakingERC20.mint(userAlice, ALICE_STAKINGERC20_MINTEDAMOUNT);
-        stakingERC20.mint(userBob, BOB_STAKINGERC20_MINTEDAMOUNT);
-        stakingERC20.mint(userCherry, CHERRY_STAKINGERC20_MINTEDAMOUNT);
-        vm.stopPrank();
-        debugLog("Erc20Setup3 setUp() end");
-    }
-}
-
-// ----------------
-
-contract StakingSetup is TestLog {
-
-    StakingRewards2 internal stakingRewards2;
-
-    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY_LP = 6;
-    uint256 constant internal VARIABLE_REWARD_MAXTOTALSUPPLY = VARIABLE_REWARD_MAXTOTALSUPPLY_LP * ONE_TOKEN; // Max LP : 5
-    uint256 constant internal CONSTANT_REWARDRATE_PERTOKENSTORED = 1e3; // 1 000 000 ; for each LP token earn 1 000 reward per second
-
-    uint256 constant internal REWARD_INITIAL_DURATION = 10_000; // 10e4 ; 10 000 s. = 2h 46m 40s
-
-    uint256 constant internal REWARD_INITIAL_AMOUNT = CONSTANT_REWARDRATE_PERTOKENSTORED * VARIABLE_REWARD_MAXTOTALSUPPLY * REWARD_INITIAL_DURATION;
-    // console.log("StakingSetup: REWARD_INITIAL_AMOUNT = ", REWARD_INITIAL_AMOUNT);
-
-    uint256 immutable STAKING_START_TIME = block.timestamp;
-
-    function checkRewardPerToken(uint256 _expectedRewardPerToken, uint256 _delta) public {
-        uint256 stakingRewardsRewardPerToken = stakingRewards2.rewardPerToken();
-        verboseLog( "checkRewardPerToken rewardPerToken = ", stakingRewards2.rewardPerToken() );
-        verboseLog( "checkRewardPerToken expected rewardPerToken = ", _expectedRewardPerToken );
-        if ( _delta == 0 ) {
-            assertEq( stakingRewardsRewardPerToken, _expectedRewardPerToken, "Unexpected rewardPerToken() value");
-        } else {
-            assertApproxEqRel( stakingRewardsRewardPerToken, _expectedRewardPerToken, _delta, "Unexpected rewardPerToken() value");
-        }
-    }
 }
 
 contract StakingSetup1 is Erc20Setup1, StakingSetup {
 
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
-        // console.log("StakingSetup1 setUp()");
+    function setUp() public virtual override(Erc20Setup1, StakingSetup) {
         debugLog("StakingSetup1 setUp() start");
+        verboseLog("StakingSetup1");
         Erc20Setup1.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
@@ -313,23 +87,10 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
         debugLog("StakingSetup1 setUp() end");
     }
 
-    function checkRewardForDuration() public {
-        uint256 rewardForDuration;
-
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        verboseLog( "checkRewardForDuration: getRewardForDuration = ", stakingRewards2.getRewardForDuration() );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION ); // epoch last time reward
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION + 1 ); // epoch ended
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        verboseLog( "Staking contract: rewardsDuration ok" );
+    function checkAliceStake() internal {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
+
 }
 
 // ----------------
@@ -339,10 +100,11 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
     uint256 constant ALICE_STAKINGERC20_STAKEDAMOUNT = ALICE_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
-        // console.log("StakingSetup2 setUp()");
+    function setUp() public virtual override(Erc20Setup2, StakingSetup) {
         debugLog("StakingSetup2 setUp() start");
+        verboseLog("StakingSetup2");
         Erc20Setup2.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
@@ -367,23 +129,13 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
         debugLog("StakingSetup2 setUp() end");
     }
 
-    function checkRewardForDuration() public {
-        uint256 rewardForDuration;
-
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        verboseLog( "checkRewardForDuration: getRewardForDuration = ", stakingRewards2.getRewardForDuration() );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION ); // epoch last time reward
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION + 1 ); // epoch ended
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        verboseLog( "Staking contract: rewardsDuration ok" );
+    function checkAliceStake() internal {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
+    function checkBobStake() internal {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+
 }
 
 // ----------------
@@ -394,10 +146,12 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
     uint256 constant BOB_STAKINGERC20_STAKEDAMOUNT = BOB_STAKINGERC20_MINTEDAMOUNT;
     uint256 constant CHERRY_STAKINGERC20_STAKEDAMOUNT = CHERRY_STAKINGERC20_MINTEDAMOUNT;
 
-    function setUp() public virtual override {
+    function setUp() public virtual override(Erc20Setup3, StakingSetup) {
         // console.log("StakingSetup3 setUp()");
         debugLog("StakingSetup3 setUp() start");
+        verboseLog("StakingSetup3");
         Erc20Setup3.setUp();
+        StakingSetup.setUp();
         vm.prank( userStakingRewardAdmin );
         stakingRewards2 = new StakingRewards2( address(rewardErc20), address(stakingERC20) );
         assertEq( userStakingRewardAdmin, stakingRewards2.owner(), "stakingRewards2: Wrong owner" );
@@ -421,23 +175,16 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
         debugLog("StakingSetup3 setUp() end");
     }
 
-    function checkRewardForDuration() public {
-        uint256 rewardForDuration;
-
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        verboseLog( "checkRewardForDuration: getRewardForDuration = ", stakingRewards2.getRewardForDuration() );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION ); // epoch last time reward
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        vm.warp( STAKING_START_TIME + REWARD_INITIAL_DURATION + 1 ); // epoch ended
-        rewardForDuration = stakingRewards2.getRewardForDuration( );
-        assertEq( rewardForDuration, REWARD_INITIAL_AMOUNT );
-
-        verboseLog( "Staking contract: rewardsDuration ok" );
+    function checkAliceStake() internal {
+        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
     }
+    function checkBobStake() internal {
+        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
+    }
+    function checkCherryStake() internal {
+        itStakesCorrectly( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Cherry" );
+    }
+
 }
 
 
@@ -445,11 +192,12 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
 
 contract DepositSetup1 is StakingSetup1 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
+    // uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
 
     function setUp() public virtual override {
         // console.log("DepositSetup1 setUp()");
         debugLog("DepositSetup1 setUp() start");
+        verboseLog("DepositSetup1 setUp()");
         StakingSetup1.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -457,25 +205,20 @@ contract DepositSetup1 is StakingSetup1 {
         emit StakingRewards2.Staked( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( ALICE_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup1 setUp() end");
     }
 
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
-    }
 }
 
 // ----------------
 
 contract DepositSetup2 is StakingSetup2 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
-
     function setUp() public virtual override {
         // console.log("DepositSetup2 setUp()");
         debugLog("DepositSetup2 setUp() start");
+        verboseLog("DepositSetup2 setUp()");
         StakingSetup2.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -488,26 +231,20 @@ contract DepositSetup2 is StakingSetup2 {
         emit StakingRewards2.Staked( userBob, BOB_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( BOB_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT + BOB_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup2 setUp() end");
     }
 
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
-    }
 }
 
 // ----------------
 
 contract DepositSetup3 is StakingSetup3 {
 
-    uint256 constant internal TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
-        + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
-
     function setUp() public virtual override {
         // console.log("DepositSetup3 setUp()");
         debugLog("DepositSetup3 setUp() start");
+        verboseLog("DepositSetup3 setUp()");
         StakingSetup3.setUp();
         vm.startPrank(userAlice);
         stakingERC20.approve( address(stakingRewards2), ALICE_STAKINGERC20_STAKEDAMOUNT );
@@ -525,21 +262,16 @@ contract DepositSetup3 is StakingSetup3 {
         emit StakingRewards2.Staked( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT );
         stakingRewards2.stake( CHERRY_STAKINGERC20_STAKEDAMOUNT );
         vm.stopPrank();
+        TOTAL_STAKED_AMOUNT = ALICE_STAKINGERC20_STAKEDAMOUNT
+        + BOB_STAKINGERC20_STAKEDAMOUNT + CHERRY_STAKINGERC20_STAKEDAMOUNT;
         debugLog("DepositSetup3 setUp() end");
     }
 
-    function checkStakingTotalSupplyStaked() public {
-        uint256 stakingRewardsTotalSupply = stakingRewards2.totalSupply();
-        assertEq( TOTAL_STAKED_AMOUNT, stakingRewardsTotalSupply );
-        verboseLog( "checkStakingTotalSupplyStaked", stakingRewardsTotalSupply );
-    }
 }
 
 // ----------------------------------------------------------------------------
 
 contract DuringStaking1_WithoutWithdral is DepositSetup1 {
-
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -548,57 +280,14 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
     function setUp() public override {
         debugLog("DuringStaking1_WithoutWithdral setUp() start");
         DepositSetup1.setUp();
-        // console.log("DuringStaking1_WithoutWithdral");
+        verboseLog("DuringStaking1_WithoutWithdral");
         debugLog("DuringStaking1_WithoutWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
     }
 
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    // Goto some staking time within period
-
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
-    }
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
 
         uint256 stakerRewards = stakingRewards2.earned( _staker );
@@ -612,16 +301,8 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         verboseLog( " rewards earned = ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0);
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
@@ -630,19 +311,13 @@ contract DuringStaking1_WithoutWithdral is DepositSetup1 {
         uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
         verboseLog( "Staking duration reached (%%) : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
-        // uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-        //     REWARD_INITIAL_AMOUNT * ONE_TOKEN; / TOTAL_STAKED_AMOUNT :
-        //     REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN; / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
-        // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
 // ------------------------------------
 
 contract DuringStaking2_WithoutWithdral is DepositSetup2 {
-
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -651,59 +326,13 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
     function setUp() public override {
         debugLog("DuringStaking2_WithoutWithdral setUp() start");
         DepositSetup2.setUp();
-        // console.log("DuringStaking2_WithoutWithdral");
+        verboseLog("DuringStaking2_WithoutWithdral");
         debugLog("DuringStaking2_WithoutWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
-    }
-
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    // Goto some staking time within period
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
@@ -718,16 +347,8 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0);
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
@@ -737,19 +358,13 @@ contract DuringStaking2_WithoutWithdral is DepositSetup2 {
         verboseLog( "Staking duration reached (%%) : ", STAKING_PERCENTAGE_DURATION );
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
-        // uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-        //     REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
-        //     REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
-        // // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
 // ------------------------------------
 
 contract DuringStaking3_WithoutWithdral is DepositSetup3 {
-
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
 
     constructor (uint256 _stakingPercentageDuration) {
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
@@ -758,65 +373,16 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
     function setUp() public override {
         debugLog("DuringStaking3_WithoutWithdral setUp() start");
         DepositSetup3.setUp();
-        // console.log("DuringStaking3_WithoutWithdral");
+        verboseLog("DuringStaking3_WithoutWithdral");
         debugLog("DuringStaking3_WithoutWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly(userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
-    function checkCherryStake() public {
-        itStakesCorrectly(userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
         checkCherryStake();
     }
 
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    // Goto some staking time within period
-
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
-    }
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
 
         uint256 stakerRewards = stakingRewards2.earned( _staker );
@@ -829,16 +395,8 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0 );
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
@@ -849,11 +407,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_4 );
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
         checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, stakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0_31 );
-        // uint256 expectedRewardPerToken = (getRewardDurationReached() == REWARD_INITIAL_DURATION ?
-        //     REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
-        //     REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
-        // // verboseLog( "expectedRewardPerToken = ", expectedRewardPerToken );
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
@@ -863,7 +417,6 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
 
 contract DuringStaking1_WithWithdral is DepositSetup1 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -874,76 +427,12 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
     function setUp() public override {
         debugLog("DuringStaking1_WithWithdral setUp() start");
         DepositSetup1.setUp();
-        // console.log("DuringStaking1_WithWithdral");
+        verboseLog("DuringStaking1_WithWithdral");
         debugLog("DuringStaking1_WithWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
-    }
-
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
-        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    function getStakingDuration() internal view returns (uint256) {
-        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
-        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
-        return stakingDuration;
-    }
-
-    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
-        uint256 stakingDuration = getStakingDuration() / _divide;
-        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
-        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
-        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
-        return rewardedStakingDuration;
-    }
-
-    // Goto some staking time within period
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
@@ -957,28 +446,8 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
-        public view /* pure */
-        returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-    function withdrawStake(address _user, uint256 _amount) public {
-        uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
-        // Check emitted event
-        vm.expectEmit(true,true,false,false, address(stakingRewards2));
-        emit StakingRewards2.Withdrawn( _user, _amount );
-        vm.prank(_user);
-        stakingRewards2.withdraw( _amount );
-        uint256 balanceOfUserAfterWithdrawal = stakingRewards2.balanceOf(_user);
-        assertEq( balanceOfUserBeforeWithdrawal - _amount, balanceOfUserAfterWithdrawal );
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0 );
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         checkUsersStake();
@@ -998,7 +467,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
 
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , DELTA_0 );
 
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
@@ -1007,7 +476,6 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
 
 contract DuringStaking2_WithWithdral is DepositSetup2 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -1018,80 +486,13 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     function setUp() public override {
         debugLog("DuringStaking2_WithWithdral setUp() start");
         DepositSetup2.setUp();
-        // console.log("DuringStaking2_WithWithdral");
+        verboseLog("DuringStaking2_WithWithdral");
         debugLog("DuringStaking2_WithWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
-    }
-
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
-        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    function getStakingDuration() internal view returns (uint256) {
-        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
-        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
-        return stakingDuration;
-    }
-
-    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
-        uint256 stakingDuration = getStakingDuration() / _divide;
-        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
-        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
-        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
-        return rewardedStakingDuration;
-    }
-
-    // Goto some staking time within period
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
@@ -1105,29 +506,8 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
-        public view /* pure */
-        returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-
-    function withdrawStake(address _user, uint256 _amount) public {
-        uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
-        // Check emitted event
-        vm.expectEmit(true,true,false,false, address(stakingRewards2));
-        emit StakingRewards2.Withdrawn( _user, _amount );
-        vm.prank(_user);
-        stakingRewards2.withdraw( _amount );
-        uint256 balanceOfUserAfterWithdrawal = stakingRewards2.balanceOf(_user);
-        assertEq( balanceOfUserBeforeWithdrawal - _amount, balanceOfUserAfterWithdrawal );
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0 );
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         checkUsersStake();
@@ -1152,7 +532,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         checkStakingRewards( userAlice, "Alice", expectedStakingRewards( ALICE_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
 
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
@@ -1162,7 +542,6 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
 
 contract DuringStaking3_WithWithdral is DepositSetup3 {
 
-    uint256 immutable STAKING_PERCENTAGE_DURATION;
     // TODO: change to a constructor parameter and improve accuracy (e.g. 1e18)
     uint8 immutable DIVIDE = 2; // Liquidity is withdrawn at 50% of the staking duration
 
@@ -1173,84 +552,14 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
     function setUp() public override {
         debugLog("DuringStaking3_WithWithdral setUp() start");
         DepositSetup3.setUp();
-        // console.log("DuringStaking3_WithWithdral");
+        verboseLog("DuringStaking3_WithWithdral");
         debugLog("DuringStaking3_WithWithdral setUp() end");
     }
 
-    function itStakesCorrectly(address _user, uint256 _stakeAmount, string memory _userName) public {
-        uint256 userStakedBalance = stakingRewards2.balanceOf(address(_user));
-        verboseLog(_userName);
-        verboseLog(" staked balance: ", userStakedBalance);
-        assertEq( _stakeAmount, userStakedBalance );
-    }
-
-    function checkAliceStake() public {
-        itStakesCorrectly( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice" );
-    }
-    function checkBobStake() public {
-        itStakesCorrectly( userBob, BOB_STAKINGERC20_STAKEDAMOUNT, "Bob" );
-    }
-    function checkCherryStake() public {
-        itStakesCorrectly( userCherry, CHERRY_STAKINGERC20_STAKEDAMOUNT, "Cherry" );
-    }
     function checkUsersStake() public {
         checkAliceStake();
         checkBobStake();
         checkCherryStake();
-    }
-
-    function getRewardDurationReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = (STAKING_PERCENTAGE_DURATION >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-    function getRewardDurationReached(uint _durationReached) internal pure returns (uint256) {
-        uint256 rewardDurationReached = (_durationReached >= REWARD_INITIAL_DURATION ? REWARD_INITIAL_DURATION : _durationReached);
-        // verboseLog( "getRewardDurationReached: ",  rewardDurationReached);
-        return rewardDurationReached;
-    }
-
-
-    function getStakingTimeReached() internal view returns (uint256) {
-        uint256 rewardDurationReached = getRewardDurationReached();
-        verboseLog( "getStakingTimeReached: rewardDurationReached = ",  rewardDurationReached);
-        return STAKING_START_TIME + rewardDurationReached;
-    }
-
-    function getStakingDuration() internal view returns (uint256) {
-        uint256 stakingDuration = REWARD_INITIAL_DURATION * STAKING_PERCENTAGE_DURATION / PERCENT_100;
-        verboseLog( "getStakingDuration: stakingDuration = ",  stakingDuration);
-        return stakingDuration;
-    }
-
-    function getRewardedStakingDuration(uint8 _divide) internal view returns (uint256) {
-        uint256 stakingDuration = getStakingDuration() / _divide;
-        verboseLog( "getRewardedStakingDuration: stakingDuration = ",  stakingDuration);
-        uint256 rewardedStakingDuration = getRewardDurationReached( stakingDuration );
-        verboseLog( "getRewardedStakingDuration: rewardedStakingDuration = ",  rewardedStakingDuration);
-        return rewardedStakingDuration;
-    }
-
-    // Goto some staking time within period
-    function gotoStakingPeriod(uint256 _stakingPercentageDurationReached) private returns (uint256) {
-        // vm.warp( getStakingTimeReached() );
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "gotoStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        uint256 gotoStakingPeriodResult = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        verboseLog( "gotoStakingPeriod: gotoStakingPeriodResult = ",  gotoStakingPeriodResult);
-        vm.warp(gotoStakingPeriodResult);
-        return gotoStakingPeriodResult;
-    }
-
-    function checkStakingPeriod(uint256 _stakingPercentageDurationReached) public {
-        assertTrue(_stakingPercentageDurationReached <= STAKING_PERCENTAGE_DURATION, "checkStakingPeriod: _stakingPercentageDurationReached > STAKING_PERCENTAGE_DURATION"  );
-        // uint256 stakingTimeReached = getStakingTimeReached();
-        uint256 stakingTimeReached = STAKING_START_TIME + (_stakingPercentageDurationReached >= PERCENT_100 ? REWARD_INITIAL_DURATION : REWARD_INITIAL_DURATION * _stakingPercentageDurationReached / PERCENT_100);
-        uint256 lastTimeReward = stakingRewards2.lastTimeRewardApplicable();
-        // verboseLog( "stakingTimeReached", stakingTimeReached );
-        // verboseLog( "lastTimeReward", lastTimeReward );
-        assertEq( block.timestamp, stakingTimeReached , "Wrong block.timestamp" );
-        assertEq( lastTimeReward, stakingTimeReached, "Wrong lastTimeReward" );
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _delta) public {
@@ -1265,29 +574,8 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _durationReached , uint256 _rewardTotalDuration)
-        public view /* pure */
-        returns (uint256 expectedRewardsAmount) {
-        uint256 rewardsDuration = Math.min(_durationReached, _rewardTotalDuration);
-        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
-        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
-        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
-        return expectedStakingRewardsAmount;
-    }
-
-    function withdrawStake(address _user, uint256 _amount) public {
-        uint256 balanceOfUserBeforeWithdrawal = stakingRewards2.balanceOf(_user);
-        // Check emitted event
-        vm.expectEmit(true,true,false,false, address(stakingRewards2));
-        emit StakingRewards2.Withdrawn( _user, _amount );
-        vm.prank(_user);
-        stakingRewards2.withdraw( _amount );
-        uint256 balanceOfUserAfterWithdrawal = stakingRewards2.balanceOf(_user);
-        assertEq( balanceOfUserBeforeWithdrawal - _amount, balanceOfUserAfterWithdrawal );
-    }
-
     function testUsersStakingRewards() public {
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0 );
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED , 0, 0 );
         checkRewardForDuration();
         checkStakingTotalSupplyStaked();
         checkUsersStake();
@@ -1315,7 +603,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
         checkStakingRewards( userBob, "Bob", expectedStakingRewards( BOB_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
         checkStakingRewards( userCherry, "Cherry", expectedStakingRewards( CHERRY_STAKINGERC20_STAKEDAMOUNT, usersStakingElapsedTime, REWARD_INITIAL_DURATION ) , delta );
 
-        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0 ); // no delta needed
+        checkRewardPerToken( CONSTANT_REWARDRATE_PERTOKENSTORED, 0, 0 ); // no delta needed
     }
 }
 
@@ -1428,6 +716,9 @@ contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PE
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
 // TODO: test claim rewards
 // 22 tests
+// contract DuringStaking3_WithoutWithdral_100 is DuringStaking3_WithoutWithdral(PERCENT_100) {
+// }
+
 // /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
@@ -1581,6 +872,7 @@ contract DuringStaking2_WithWithdral220 is DuringStaking2_WithWithdral(PERCENT_2
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
+
 // /*
 contract DuringStaking3_WithWithdral0 is DuringStaking3_WithWithdral(0) {
 }
