@@ -118,14 +118,14 @@ contract StakingSetup is TestLog {
     }
 
     function checkStakingRewards(address _staker, string memory _stakerName, uint256 _expectedRewardAmount, uint256 _percentDelta, uint8 _unitsDelta) internal {
-        debugLog("checkStakingRewards: _stakerName = ", _stakerName);
-        debugLog("checkStakingRewards: _expectedRewardAmount = ", _expectedRewardAmount);
-        debugLog("checkStakingRewards: _percentDelta = ", _percentDelta);
+        debugLog("checkStakingRewards: _stakerName : ", _stakerName);
+        debugLog("checkStakingRewards: _expectedRewardAmount : ", _expectedRewardAmount);
+        debugLog("checkStakingRewards: _percentDelta : ", _percentDelta);
         uint256 stakerRewards = stakingRewards2.earned( _staker );
+        debugLog("checkStakingRewards: stakerRewards = ", stakerRewards);
 
         if (stakerRewards != _expectedRewardAmount) {
             debugLog("stakerRewards != _expectedRewardAmount");
-            debugLog("checkStakingRewards: stakerRewards = ", stakerRewards);
             if (_expectedRewardAmount == 0) {
                 fail("StakingSetup: checkStakingRewards: stakerRewards != _expectedRewardAmount && _expectedRewardAmount == 0");
             }
@@ -155,16 +155,29 @@ contract StakingSetup is TestLog {
         verboseLog( " rewards: ",  stakerRewards);
     }
 
-    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+    // function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached, uint256 _rewardTotalDuration) internal view returns (uint256 expectedRewardsAmount) {
+    //     debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
+    //     debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
+    //     debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
+    //     uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
+    //     debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
+    //     uint256 expectedStakingRewards_ =
+    //      (rewardsDuration == _rewardTotalDuration ?
+    //         REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
+    //         REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
+    //     );
+    //     debugLog("expectedStakingRewards: expectedStakingRewards_ = ", expectedStakingRewards_);
+    //     return expectedStakingRewards_;
+    // }
+    function expectedStakingRewards(uint256 _stakedAmount, uint256 _rewardDurationReached , uint256 _rewardTotalDuration) public view /* pure */ returns (uint256 expectedRewardsAmount) {
         debugLog("expectedStakingRewards: _stakedAmount = ", _stakedAmount);
         debugLog("expectedStakingRewards: _rewardDurationReached = ", _rewardDurationReached);
         debugLog("expectedStakingRewards: _rewardTotalDuration = ", _rewardTotalDuration);
         uint256 rewardsDuration = Math.min(_rewardDurationReached, _rewardTotalDuration);
-        debugLog("expectedStakingRewards: rewardsDuration = ", rewardsDuration);
-        return (rewardsDuration == _rewardTotalDuration ?
-            REWARD_INITIAL_AMOUNT * _stakedAmount / TOTAL_STAKED_AMOUNT :
-            REWARD_INITIAL_AMOUNT * _stakedAmount * rewardsDuration / _rewardTotalDuration / TOTAL_STAKED_AMOUNT
-        );
+        verboseLog( "expectedStakingRewards: rewardsDuration= ", rewardsDuration );
+        uint256 expectedStakingRewardsAmount = CONSTANT_REWARDRATE_PERTOKENSTORED * _stakedAmount / ONE_TOKEN * rewardsDuration;
+        verboseLog( "expectedStakingRewards: expectedStakingRewardsAmount= ", expectedStakingRewardsAmount );
+        return expectedStakingRewardsAmount;
     }
 
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta, RewardERC20 rewardErc20) internal returns(uint256 claimedRewards_) {
@@ -1423,6 +1436,9 @@ contract DuringStaking2_WithoutWithdral_220 is DuringStaking2_WithoutWithdral(PE
 // 3 stakers deposit right after staking starts and keep staked amount until the end of staking period
 // TODO: test claim rewards
 // 22 tests
+// contract DuringStaking3_WithoutWithdral_100 is DuringStaking3_WithoutWithdral(PERCENT_100) {
+// }
+
 // /*
 contract DuringStaking3_WithoutWithdral_0 is DuringStaking3_WithoutWithdral(0) {
 }
@@ -1576,6 +1592,7 @@ contract DuringStaking2_WithWithdral220 is DuringStaking2_WithWithdral(PERCENT_2
 // 3 stakers deposit right after staking starts and removes all staked amount after half of staking percentage duration
 // TODO: test claim rewards
 // 22 tests
+
 // /*
 contract DuringStaking3_WithWithdral0 is DuringStaking3_WithWithdral(0) {
 }
