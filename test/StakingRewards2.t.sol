@@ -290,6 +290,8 @@ contract StakingSetup1 is Erc20Setup1, StakingSetup {
         vm.prank( userStakingRewardAdmin );
         stakingRewards2.notifyRewardAmount(REWARD_INITIAL_AMOUNT);
 
+        // TODO : check event RewardAdded(REWARD_INITIAL_AMOUNT;
+
         debugLog("Staking start time", STAKING_START_TIME);
         debugLog("StakingSetup1 setUp() end");
     }
@@ -323,6 +325,8 @@ contract StakingSetup2 is Erc20Setup2, StakingSetup {
 
         vm.prank( userStakingRewardAdmin );
         stakingRewards2.notifyRewardAmount(REWARD_INITIAL_AMOUNT);
+
+        // TODO : check event RewardAdded(REWARD_INITIAL_AMOUNT;
 
         debugLog("Staking start time", STAKING_START_TIME);
         debugLog("StakingSetup2 setUp() end");
@@ -361,6 +365,8 @@ contract StakingSetup3 is Erc20Setup3, StakingSetup {
 
         vm.prank( userStakingRewardAdmin );
         stakingRewards2.notifyRewardAmount(REWARD_INITIAL_AMOUNT);
+
+        // TODO : check event RewardAdded(REWARD_INITIAL_AMOUNT;
 
         debugLog("Staking start time", STAKING_START_TIME);
         debugLog("StakingSetup3 setUp() end");
