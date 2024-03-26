@@ -16,7 +16,7 @@ import { Pausable } from "@openzeppelin/contracts@5.0.2/utils/Pausable.sol";
 
 // ----------------
 
-abstract contract StakingPrePetup0 is TestLog {
+abstract contract StakingPreSetup0 is TestLog {
         // Rewards constants
 
     // Duration of the rewards program
@@ -26,7 +26,7 @@ abstract contract StakingPrePetup0 is TestLog {
     internal view virtual returns (uint256 expectedRewardsAmount);
 }
 
-abstract contract StakingPreSetup1 is StakingPrePetup0 {
+abstract contract StakingPreSetup1 is StakingPreSetup0 {
 
     // // Rewards constants
 
