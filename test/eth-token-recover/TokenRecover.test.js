@@ -3,7 +3,8 @@ const { expectRevertCustomError } = require('./helpers/customError');
 
 const { shouldBehaveLikeTokenRecover } = require('./TokenRecover.behavior');
 
-const TokenRecover = artifacts.require('$TokenRecover');
+// const TokenRecover = artifacts.require('$TokenRecover');
+const TokenRecover = artifacts.require('TokenRecover');
 
 contract('TokenRecover', function (accounts) {
   const [owner, receiver] = accounts;

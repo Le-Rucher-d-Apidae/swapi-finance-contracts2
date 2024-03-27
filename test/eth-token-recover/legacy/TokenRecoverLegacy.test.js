@@ -1,6 +1,7 @@
 const { shouldBehaveLikeTokenRecoverLegacy } = require('./TokenRecoverLegacy.behavior');
 
-const TokenRecoverLegacy = artifacts.require('$TokenRecoverLegacy');
+// const TokenRecoverLegacy = artifacts.require('$TokenRecoverLegacy');
+const TokenRecoverLegacy = artifacts.require('TokenRecoverLegacy');
 
 contract('TokenRecoverLegacy', function (accounts) {
   const [owner, anotherAccount] = accounts;

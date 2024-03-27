@@ -7,7 +7,8 @@ const { shouldBehaveLikeRecoverERC20 } = require('../recover/RecoverERC20.behavi
 
 const { shouldBehaveLikeOwnable } = require('../access/Ownable.behavior');
 
-const ERC20 = artifacts.require('$ERC20Mock');
+// const ERC20 = artifacts.require('$ERC20Mock');
+const ERC20 = artifacts.require('ERC20Mock');
 
 function shouldBehaveLikeTokenRecoverLegacy(owner, anotherAccount) {
   const amount = new BN(100);
