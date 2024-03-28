@@ -1,1 +1,2 @@
 src/contracts/Uniswap/**
+src/contracts/StakingRewards.sol

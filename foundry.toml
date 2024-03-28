@@ -11,8 +11,9 @@
   evm_version = "paris"           # See https://www.evmdiff.com/features?name=PUSH0&kind=opcode
   fuzz = { runs = 1_000 }
   gas_reports = ["*"]
-  optimizer = true
-  optimizer_runs = 10_000
+  optimizer = false
+  #optimizer_runs = 10_000
+  optimizer_runs = 200
   out = "out"
   script = "script"
   #multiple solc versions needed: do not set any specific version
@@ -34,19 +35,20 @@
   mainnet = { key = "${API_KEY_ETHERSCAN}" }
   optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
   polygon = { key = "${API_KEY_POLYGONSCAN}" }
+  polygon_mumbai = { key = "${API_KEY_POLYGONSCAN}" }
   sepolia = { key = "${API_KEY_ETHERSCAN}" }
 
 [fmt]
   bracket_spacing = true
   int_types = "long"
-  line_length = 120
+  line_length = 118
   multiline_func_header = "all"
   number_underscore = "thousands"
   quote_style = "double"
   tab_width = 4
   wrap_comments = true
   single_line_statement_blocks = "preserve"
-  ignore = [ "src/contracts/Uniswap/v2-core/interfaces/*.sol", "src/contracts/Uniswap/v2-core/libraries/*.sol", "src/contracts/Uniswap/v2-core/*.sol", "src/contracts/Uniswap/solidity-lib/libraries/*.sol", "src/contracts/Uniswap/v2-periphery/interfaces/*.sol", "src/contracts/Uniswap/v2-periphery/*.sol", "src/contracts/Uniswap/v2-periphery/libraries/*.sol" ]
+  ignore = [ "test/ds-test/test.sol", "test/utils/*.sol", "src/contracts/Uniswap/v2-core/interfaces/*.sol", "src/contracts/Uniswap/v2-core/libraries/*.sol", "src/contracts/Uniswap/v2-core/*.sol", "src/contracts/Uniswap/solidity-lib/libraries/*.sol", "src/contracts/Uniswap/v2-periphery/interfaces/*.sol", "src/contracts/Uniswap/v2-periphery/*.sol", "src/contracts/Uniswap/v2-periphery/libraries/*.sol" ]
 
 [rpc_endpoints]
   arbitrum = "https://arbitrum-mainnet.infura.io/v3/${API_KEY_INFURA}"
@@ -58,4 +60,5 @@
   mainnet = "https://eth-mainnet.g.alchemy.com/v2/${API_KEY_ALCHEMY}"
   optimism = "https://optimism-mainnet.infura.io/v3/${API_KEY_INFURA}"
   polygon = "https://polygon-mainnet.infura.io/v3/${API_KEY_INFURA}"
+  polygon_mumbai = "https://polygon-mumbai.infura.io/v3/${API_KEY_INFURA}"
   sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
