@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// pragma solidity ^0.7.6;
-// pragma solidity >=0.8.23 < 0.9.0;
+
 // pragma solidity ^0.8.23;
 pragma solidity >=0.8.20 < 0.9.0;
 
@@ -400,16 +399,13 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
     /* ========== DEBUG ========== */
 
     // DELETE all the following functions after debugging
-
-    /**
-     * @dev Withdraw without caring about rewards. EMERGENCY ONLY.
-     */
+    /*
+    //  * @dev Withdraw without caring about rewards. EMERGENCY ONLY.
     function withdrawAllOnly() external {
         withdraw(_balances[msg.sender]);
     }
-    /**
-     * @dev for testing only. remove after debugging
-     */
+
+    //  * @dev for testing only. remove after debugging
 
     function emergencyWithdrawUnsafe() external {
         uint256 amount = _balances[msg.sender];
@@ -419,9 +415,8 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         stakingToken.safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
-    /**
-     * @dev for testing only. remove after debugging
-     */
+
+    //  * @dev for testing only. remove after debugging
 
     function emergencyWithdrawAllUnsafe() external onlyOwner {
         uint256 amount = _totalSupply;
@@ -430,6 +425,6 @@ contract StakingRewards2 is ReentrancyGuard, Ownable(msg.sender), Pausable, ISta
         stakingToken.safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
-
+    */
     //////////////////////////////////////////////////////////
 }
