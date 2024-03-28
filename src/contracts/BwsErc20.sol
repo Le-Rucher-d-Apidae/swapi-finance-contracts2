@@ -14,13 +14,20 @@ import { ERC20Burnable } from "@openzeppelin/contracts@5.0.2/token/ERC20/extensi
 import { AccessControl } from "@openzeppelin/contracts@5.0.2/access/AccessControl.sol";
 import { ERC20Permit } from "@openzeppelin/contracts@5.0.2/token/ERC20/extensions/ERC20Permit.sol";
 
-import {ERC20Recover} from "./eth-token-recover/ERC20Recover.sol";
+import { ERC20Recover } from "./eth-token-recover/ERC20Recover.sol";
 
 contract BwsErc20 is ERC20, ERC20Burnable, AccessControl, ERC20Permit, ERC20Recover {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    string constant internal NAME = "BeeWise";
+    string internal constant NAME = "BeeWise";
 
-    constructor(address defaultAdmin, address minter) ERC20(NAME, "BWS") ERC20Permit(NAME) ERC20Recover(defaultAdmin) {
+    constructor(
+        address defaultAdmin,
+        address minter
+    )
+        ERC20(NAME, "BWS")
+        ERC20Permit(NAME)
+        ERC20Recover(defaultAdmin)
+    {
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(MINTER_ROLE, minter);
     }
@@ -39,8 +46,15 @@ contract BwsErc20 is ERC20, ERC20Burnable, AccessControl, ERC20Permit, ERC20Reco
      * @param tokenReceiver The address that will receive the recovered tokens.
      * @param tokenAmount Number of tokens to be recovered.
      */
-    function recoverERC20(address tokenAddress, address tokenReceiver, uint256 tokenAmount) public override onlyOwner {
+    function recoverERC20(
+        address tokenAddress,
+        address tokenReceiver,
+        uint256 tokenAmount
+    )
+        public
+        override
+        onlyOwner
+    {
         _recoverERC20(tokenAddress, tokenReceiver, tokenAmount);
     }
-
 }

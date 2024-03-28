@@ -52,7 +52,6 @@ interface IStakingRewards2Errors {
      */
     error CompoundDifferentTokens();
 
-
     /**
      * @dev Withdraw : Cannot withdraw more than deposited
      */
@@ -67,7 +66,9 @@ interface IStakingRewards2Errors {
     /**
      * @dev Provided reward too high (insufficient balance in staking contract).
      */
-    error ProvidedVariableRewardTooHigh(uint256 constantRewardPerTokenStored, uint256 variableRewardMaxTotalSupply, uint256 rewardBalance);
+    error ProvidedVariableRewardTooHigh(
+        uint256 constantRewardPerTokenStored, uint256 variableRewardMaxTotalSupply, uint256 rewardBalance
+    );
 
     /**
      * @dev Total supply exceeds allowed max
@@ -94,5 +95,4 @@ interface IStakingRewards2Errors {
      * @param variableRewardMaxTotalSupply .
      */
     error UpdateVariableRewardMaxTotalSupply(uint256 variableRewardMaxTotalSupply, uint256 rewardsBalance);
-
 }

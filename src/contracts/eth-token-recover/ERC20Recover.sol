@@ -6,7 +6,7 @@ pragma solidity ^0.8.23;
 // import "@openzeppelin/contracts/access/Ownable.sol";
 import { Ownable } from "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 
-import {RecoverERC20} from "./recover/RecoverERC20.sol";
+import { RecoverERC20 } from "./recover/RecoverERC20.sol";
 
 /**
  * @title ERC20Recover
@@ -16,7 +16,7 @@ abstract contract ERC20Recover is Ownable, RecoverERC20 {
     /**
      * @dev Initializes the contract setting the address provided by the deployer as the initial owner.
      */
-    constructor(address initialOwner) Ownable(initialOwner) {}
+    constructor(address initialOwner) Ownable(initialOwner) { }
 
     /**
      * @dev Recovers a `tokenAmount` of the ERC20 `tokenAddress` locked into this contract
@@ -28,7 +28,15 @@ abstract contract ERC20Recover is Ownable, RecoverERC20 {
      * @param tokenReceiver The address that will receive the recovered tokens.
      * @param tokenAmount Number of tokens to be recovered.
      */
-    function recoverERC20(address tokenAddress, address tokenReceiver, uint256 tokenAmount) public virtual onlyOwner {
+    function recoverERC20(
+        address tokenAddress,
+        address tokenReceiver,
+        uint256 tokenAmount
+    )
+        public
+        virtual
+        onlyOwner
+    {
         _recoverERC20(tokenAddress, tokenReceiver, tokenAmount);
     }
 }
