@@ -34,8 +34,9 @@
   "scripts": {
     "cleanForge": "rm -rf cache out",
     "build": "forge build",
-    "lint": "pnpm run lint:sol && pnpm run prettier:check",
-    "lint:sol": "forge fmt --check && pnpm solhint {script,src,test}/**/*.sol",
+    "lint": "pnpm run lint:sol:check && pnpm run prettier:check",
+    "lint:sol:check": "forge fmt --check && pnpm solhint {script,src,test}/**/*.sol",
+    "lint:sol:write": "forge fmt && pnpm solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check **/*.{json,md,yml} --ignore-path=.prettierignore",
     "prettier:write": "prettier --write **/*.{json,md,yml} --ignore-path=.prettierignore",
     "forge:test": "forge test",
