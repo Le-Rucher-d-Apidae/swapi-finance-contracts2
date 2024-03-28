@@ -469,6 +469,7 @@ contract DuringStaking3_WithoutWithdral is DepositSetup3 {
             REWARD_INITIAL_AMOUNT * ONE_TOKEN / TOTAL_STAKED_AMOUNT :
             REWARD_INITIAL_AMOUNT * getRewardDurationReached() * ONE_TOKEN / TOTAL_STAKED_AMOUNT / REWARD_INITIAL_DURATION);
         debugLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+
         checkRewardPerToken( expectedRewardPerToken, DELTA_0_015 , 0 );
     }
 }
@@ -526,10 +527,22 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
             userAliceClaimedRewards = checkUserClaim( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT, "Alice", DELTA_0_015, rewardErc20 );
         }
 
+        verboseLog( "Staking duration (%%) = STAKING_PERCENTAGE_DURATION / 2  : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
         gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
         checkStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
 
+
+        verboseLog( "Staking duration reached (%%) before withdrawal(s) = : ", STAKING_PERCENTAGE_DURATION / DIVIDE );
+        // Alice withdraws all
+        withdrawStake( userAlice, ALICE_STAKINGERC20_STAKEDAMOUNT );
+
         stakingElapsedTime = block.timestamp - STAKING_START_TIME;
+
+        // gotoStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+        // checkStakingPeriod( STAKING_PERCENTAGE_DURATION / DIVIDE );
+
+        gotoStakingPeriod( STAKING_PERCENTAGE_DURATION );
+
         debugLog( "stakingElapsedTime = ", stakingElapsedTime );
         debugLog( "reward duration (%%) of total staking reward duration = ", getRewardDurationReached() );
         debugLog( "Staking duration (%%) total staking reward duration = ", STAKING_PERCENTAGE_DURATION * REWARD_INITIAL_DURATION / PERCENT_100 );
@@ -542,6 +555,7 @@ contract DuringStaking1_WithWithdral is DepositSetup1 {
         checkStakingRewards( userAlice, "Alice", userAliceExpectedRewards , DELTA_0, 0 );
         uint256 expectedRewardPerToken = REWARD_INITIAL_AMOUNT * getRewardedStakingDuration(DIVIDE) * ONE_TOKEN / REWARD_INITIAL_DURATION / TOTAL_STAKED_AMOUNT;
         debugLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+
         checkRewardPerToken( expectedRewardPerToken, 0, 0 ); // no delta needed
     }
 }
@@ -557,7 +571,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     constructor (uint256 _stakingPercentageDuration, uint256 _claimPercentageDuration) {
         // Claim must be BEFORE (or equal to) half of the staking duration, else reward computaton will underflow
         if ( CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE ) {
-            fail("DuringStaking1_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
+            fail("DuringStaking2_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
         }
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
         require(_claimPercentageDuration <= (_stakingPercentageDuration / DIVIDE), "DuringStaking1_WithoutWithdral: _claimPercentageDuration > _stakingPercentageDuration / DIVIDE");
@@ -579,7 +593,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
     function testUsersStakingRewards() public {
 
         if ( CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE ) {
-            fail("DuringStaking1_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
+            fail("DuringStaking2_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
             return;
         }
 
@@ -634,6 +648,7 @@ contract DuringStaking2_WithWithdral is DepositSetup2 {
         debugLog( "userBobExpectedRewards = ", userBobExpectedRewards );
         checkStakingRewards( userBob, "Bob", userBobExpectedRewards , rewardsDelta, 1 );
         debugLog( "expectedRewardPerToken = ", expectedRewardPerToken );
+
         checkRewardPerToken( expectedRewardPerToken, 0, 1 );
     }
 }
@@ -650,7 +665,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
     constructor (uint256 _stakingPercentageDuration, uint256 _claimPercentageDuration) {
         // Claim must be BEFORE (or equal to) half of the staking duration, else reward computaton will underflow
         if ( CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE ) {
-            fail("DuringStaking1_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
+            fail("DuringStaking3_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
         }
         STAKING_PERCENTAGE_DURATION = _stakingPercentageDuration;
         // require(_claimPercentageDuration <= _stakingPercentageDuration, "DuringStaking1_WithoutWithdral: _claimPercentageDuration > _stakingPercentageDuration");
@@ -673,7 +688,7 @@ contract DuringStaking3_WithWithdral is DepositSetup3 {
     function testUsersStakingRewards() public {
 
         if ( CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE ) {
-            fail("DuringStaking1_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
+            fail("DuringStaking3_WithWithdral: CLAIM_PERCENTAGE_DURATION > STAKING_PERCENTAGE_DURATION / DIVIDE");
             return;
         }
 
@@ -1291,7 +1306,6 @@ contract DuringStaking3_WithWithdral__220__0 is DuringStaking3_WithWithdral(PERC
 }
 contract DuringStaking3_WithWithdral__220__99 is DuringStaking3_WithWithdral(PERCENT_220, PERCENT_99) {
 }
-
 // */
 // --------------------------------------------------------
 
