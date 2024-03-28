@@ -34,7 +34,8 @@
   "scripts": {
     "cleanForge": "rm -rf cache out",
     "build": "forge build --skip test",
-    "buildAll": "forge build",
+    "build:All": "forge build",
+    "build:CI": "forge build --optimize --sizes --skip test",
     "lint": "pnpm run lint:sol:check && pnpm run prettier:check",
     "lint:sol:check": "forge fmt --check && pnpm solhint {script,src,test}/**/*.sol",
     "lint:sol:write": "forge fmt && pnpm solhint {script,src,test}/**/*.sol",
