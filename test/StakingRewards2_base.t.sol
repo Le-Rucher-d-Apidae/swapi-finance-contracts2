@@ -387,8 +387,8 @@ abstract contract StakingPreSetup is /* TestLog, */ StakingPreSetup0 {
 
     function checkUserClaim(address _user, uint256 _stakeAmount, string memory _userName, uint256 _delta, RewardERC20 rewardErc20) internal returns(uint256 claimedRewards_) {
         if (CLAIM_PERCENTAGE_DURATION > 0) {
-            verboseLog( "CLAIM:" );
-            verboseLog(_userName);
+            verboseLog( "checkUserClaim:" );
+            verboseLog( "_userName:", _userName );
             uint256 stakingElapsedTime = block.timestamp - STAKING_START_TIME;
             debugLog( "stakingElapsedTime = ", stakingElapsedTime );
             uint256 rewardErc20UserBalance = rewardErc20.balanceOf( _user );
