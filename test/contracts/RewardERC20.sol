@@ -12,13 +12,6 @@ contract RewardERC20 is ERC20, ERC20Burnable, AccessControl, ERC20Permit {
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    // constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {
-    //     this;
-    // }
-
-    // function mint(address account, uint256 amount) public {
-    //     _mint(account, amount);
-    // }
     constructor(address defaultAdmin, address minter, string memory name_, string memory symbol_) ERC20(name_, symbol_) ERC20Permit(name_) {
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(MINTER_ROLE, minter);
