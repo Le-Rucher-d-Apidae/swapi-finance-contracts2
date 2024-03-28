@@ -20,8 +20,8 @@ import "./TestsConstants.sol";
 // TODO : move to utils
 contract TestLog is Test {
 
-    bool debug = true;
-    bool verbose = true;
+    bool debug = false;
+    bool verbose = false;
     Utils internal utils;
 
     function debugLog(string memory _msg) public view {
