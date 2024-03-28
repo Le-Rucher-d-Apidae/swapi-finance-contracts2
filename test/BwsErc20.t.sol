@@ -47,7 +47,6 @@ contract UsersSetup is Test {
 }
 
 contract TokensSetup is UsersSetup {
-
     BwsErc20 internal Bws;
 
     function setUp() public virtual override {
@@ -55,7 +54,7 @@ contract TokensSetup is UsersSetup {
         verboseLog("TokensSetup setUp() start");
         UsersSetup.setUp();
         // Instantiate the contract-under-test.
-        Bws = new BwsErc20( admin, minter );
+        Bws = new BwsErc20(admin, minter);
         verboseLog("TokensSetup setUp() end");
     }
 
@@ -173,7 +172,9 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
         uint256 transferAmount = maxTransferAmount;
 
         vm.expectRevert(
-            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, from, Bws.balanceOf(from), transferAmount)
+            abi.encodeWithSelector(
+                IERC20Errors.ERC20InsufficientBalance.selector, from, Bws.balanceOf(from), transferAmount
+            )
         );
         transferToken(from, to, transferAmount);
     }
@@ -189,7 +190,6 @@ contract WhenAliceHasInsufficientFunds is WhenTransferringTokens {
 }
 
 contract RecoveringTokens is TokensSetup {
-
     MyERC20 myErc20;
 
     function setUp() public virtual override {
@@ -198,38 +198,34 @@ contract RecoveringTokens is TokensSetup {
         myErc20 = new MyERC20();
         // vm.prank();
 
-        myErc20.mint( alice, 1e18);
+        myErc20.mint(alice, 1e18);
         vm.prank(alice);
-        myErc20.transfer( address(Bws), 1e18);
+        myErc20.transfer(address(Bws), 1e18);
 
-        myErc20.mint( bob, 1e18);
+        myErc20.mint(bob, 1e18);
         vm.prank(bob);
-        myErc20.transfer( address(Bws), 1e18);
+        myErc20.transfer(address(Bws), 1e18);
 
         console.log("RecoveringTokens tokens");
         verboseLog("RecoveringTokens setUp() end");
     }
 
     function recoverERC20Token(address to, uint256 transferAmount) public /* returns (bool) */ {
-        vm.prank( admin );
-        return Bws.recoverERC20( address(myErc20), to, transferAmount );
+        vm.prank(admin);
+        return Bws.recoverERC20(address(myErc20), to, transferAmount);
     }
 
     function testRecoverERC20Token() public {
+        assertEq(myErc20.balanceOf(address(alice)), 0);
+        assertEq(myErc20.balanceOf(address(bob)), 0);
+        assertEq(myErc20.balanceOf(address(Bws)), 2e18);
 
-        assertEq( myErc20.balanceOf( address(alice) ), 0 );
-        assertEq( myErc20.balanceOf( address(bob) ), 0 );
-        assertEq( myErc20.balanceOf( address(Bws) ), 2e18 );
+        recoverERC20Token(address(alice), 1e18);
+        assertEq(myErc20.balanceOf(address(alice)), 1e18);
 
-        recoverERC20Token( address(alice), 1e18 );
-        assertEq( myErc20.balanceOf( address(alice) ), 1e18 );
+        recoverERC20Token(address(bob), 1e18);
+        assertEq(myErc20.balanceOf(address(bob)), 1e18);
 
-        recoverERC20Token( address(bob), 1e18 );
-        assertEq( myErc20.balanceOf( address(bob) ), 1e18 );
-
-        assertEq( myErc20.balanceOf( address(Bws) ), 0 );
-
-
+        assertEq(myErc20.balanceOf(address(Bws)), 0);
     }
-
 }
